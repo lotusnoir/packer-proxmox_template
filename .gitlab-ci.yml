@@ -1,6 +1,7 @@
 ---
 stages:
-  - tests
+  - lint
+  - validate
   - push
 
 variables:
@@ -10,7 +11,7 @@ variables:
 # job dependencies:
 #       file: .mega-linter.yml
 mega-linter:
-  stage: tests
+  stage: lint
   image: oxsecurity/megalinter:v7
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
@@ -21,7 +22,7 @@ mega-linter:
 
 ###########################
 packer-validation:
-  stage: tests
+  stage: validate
   image:
     name: hashicorp/packer:light
     entrypoint:
@@ -36,14 +37,6 @@ packer-validation:
     - packer --version
     - packer init providers.pkr.hcl
     - packer validate --var-file=exemples/debian12.pkrvars.hcl .
-
-###########################
-.secret-analyzer:
-  stage: tests
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
-  variables:
-    SECRET_DETECTION_HISTORIC_SCAN: "true"
 
 
 ##################################################
