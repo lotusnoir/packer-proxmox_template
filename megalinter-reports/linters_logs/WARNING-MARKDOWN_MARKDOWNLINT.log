@@ -1,0 +1,10 @@
+Results of markdownlint linter (version 0.37.0)
+See documentation on https://megalinter.io/7.4.0/descriptors/markdown_markdownlint/
+-----------------------------------------------
+
+❌ [ERROR] for workspace /builds/packer/packer-proxmox_template
+Linter raw log:
+README.md:2 MD041/first-line-heading/first-line-h1 First line in a file should be a top-level heading [Context: "## Install packer on linux min..."]
+README.md:5:10 MD034/no-bare-urls Bare URL used [Context: "https://apt.releases.hashicorp..."]
+README.md:6:73 MD034/no-bare-urls Bare URL used [Context: "https://apt.releases.hashicorp..."]
+

@@ -1,0 +1,87 @@
+----------------------------------------------------------------------------------------------------
+------------------------------------ MegaLinter, by OX Security ------------------------------------
+----------------------------------------------------------------------------------------------------
+ - Image Creation Date: 2023-09-22T15:10:54Z
+ - Image Revision: a87b2872713c6bdde46d2473c5d7ed23e5752dc2
+ - Image Version: v7.4.0
+----------------------------------------------------------------------------------------------------
+The MegaLinter documentation can be found at:
+ - https://megalinter.io/7.4.0
+----------------------------------------------------------------------------------------------------
+[0Ksection_start:`1698497958417104027`:megalinter-init[collapsed=true][0KMegaLinter initialization (expand for details)
+MegaLinter will analyze workspace [/builds/packer/packer-proxmox_template]
+
+MARKDOWN_REMARK_LINT has been temporary disabled in MegaLinter, please use a previous MegaLinter version or wait for the next one !
+Skipped linters: ACTION_ACTIONLINT, ANSIBLE_ANSIBLE_LINT, ARM_ARM_TTK, BASH_EXEC, BASH_SHELLCHECK, BASH_SHFMT, BICEP_BICEP_LINTER, CLOJURE_CLJSTYLE, CLOJURE_CLJ_KONDO, CLOUDFORMATION_CFN_LINT, COFFEE_COFFEELINT, COPYPASTE_JSCPD, CPP_CPPLINT, CSHARP_CSHARPIER, CSHARP_DOTNET_FORMAT, CSS_SCSS_LINT, CSS_STYLELINT, C_CPPLINT, DART_DARTANALYZER, DOCKERFILE_HADOLINT, EDITORCONFIG_EDITORCONFIG_CHECKER, ENV_DOTENV_LINTER, GHERKIN_GHERKIN_LINT, GO_GOLANGCI_LINT, GO_REVIVE, GRAPHQL_GRAPHQL_SCHEMA_LINTER, GROOVY_NPM_GROOVY_LINT, HTML_DJLINT, HTML_HTMLHINT, JAVASCRIPT_ES, JAVASCRIPT_PRETTIER, JAVASCRIPT_STANDARD, JAVA_CHECKSTYLE, JAVA_PMD, JSON_ESLINT_PLUGIN_JSONC, JSON_JSONLINT, JSON_NPM_PACKAGE_JSON_LINT, JSON_PRETTIER, JSON_V8R, JSX_ESLINT, KOTLIN_KTLINT, KUBERNETES_HELM, KUBERNETES_KUBECONFORM, KUBERNETES_KUBESCAPE, LATEX_CHKTEX, LUA_LUACHECK, MAKEFILE_CHECKMAKE, MARKDOWN_REMARK_LINT, OPENAPI_SPECTRAL, PERL_PERLCRITIC, PHP_PHPCS, PHP_PHPLINT, PHP_PHPSTAN, PHP_PSALM, POWERSHELL_POWERSHELL, POWERSHELL_POWERSHELL_FORMATTER, PROTOBUF_PROTOLINT, PUPPET_PUPPET_LINT, PYTHON_BANDIT, PYTHON_BLACK, PYTHON_FLAKE8, PYTHON_ISORT, PYTHON_MYPY, PYTHON_PYLINT, PYTHON_PYRIGHT, PYTHON_RUFF, RAKU_RAKU, REPOSITORY_CHECKOV, REPOSITORY_DEVSKIM, REPOSITORY_DUSTILOCK, REPOSITORY_GITLEAKS, REPOSITORY_GIT_DIFF, REPOSITORY_GRYPE, REPOSITORY_KICS, REPOSITORY_SECRETLINT, REPOSITORY_SEMGREP, REPOSITORY_SYFT, REPOSITORY_TRIVY, REPOSITORY_TRIVY_SBOM, REPOSITORY_TRUFFLEHOG, RST_RSTCHECK, RST_RSTFMT, RST_RST_LINT, RUBY_RUBOCOP, RUST_CLIPPY, R_LINTR, SALESFORCE_SFDX_SCANNER_APEX, SALESFORCE_SFDX_SCANNER_AURA, SALESFORCE_SFDX_SCANNER_LWC, SCALA_SCALAFIX, SNAKEMAKE_LINT, SNAKEMAKE_SNAKEFMT, SPELL_CSPELL, SPELL_LYCHEE, SPELL_PROSELINT, SPELL_VALE, SQL_SQLFLUFF, SQL_SQL_LINT, SQL_TSQLLINT, SWIFT_SWIFTLINT, TEKTON_TEKTON_LINT, TSX_ESLINT, TYPESCRIPT_ES, TYPESCRIPT_PRETTIER, TYPESCRIPT_STANDARD, VBDOTNET_DOTNET_FORMAT, XML_XMLLINT, YAML_PRETTIER, YAML_V8R, YAML_YAMLLINT
+To receive reports as email, please set variable EMAIL_REPORTER_EMAIL
+[0Ksection_end:`1698497960621928054`:megalinter-init[0K
+[0Ksection_start:`1698497960622683066`:megalinter-file-listing[collapsed=true][0KMegaLinter now collects the files to analyse (expand for details)
+Listing all files in directory [/builds/packer/packer-proxmox_template], then filter with:
+- File extensions: .hcl, .md, .tf
+- Excluding .gitignored files [0]: 
+Kept [4] files on [9] found files
+
++----MATCHING LINTERS-------------------+----------+----------------+------------+
+| Descriptor | Linter                   | Criteria | Matching files | Format/Fix |
++------------+--------------------------+----------+----------------+------------+
+| MARKDOWN   | markdownlint             | .md      | 1              | no         |
+| MARKDOWN   | markdown-link-check      | .md      | 1              | no         |
+| MARKDOWN   | markdown-table-formatter | .md      | 1              | no         |
+| TERRAFORM  | terragrunt               | .hcl     | 3              | no         |
++------------+--------------------------+----------+----------------+------------+
+[0Ksection_end:`1698497960630137974`:megalinter-file-listing[0K
+Processing linters on [4] parallel cores…
+[0Ksection_start:`1698497960898913270`:processed-TERRAFORM_TERRAGRUNT[collapsed=true][0K[31m❌ Linted [TERRAFORM] files with [terragrunt]: Found 1 error(s) - (0.18s)[0m (expand for details)
+- Using [terragrunt v0.51.4] https://megalinter.io/7.4.0/descriptors/terraform_terragrunt
+- MegaLinter key: [TERRAFORM_TERRAGRUNT]
+- Rules config: identified by [terragrunt]
+- Number of files analyzed: [3]
+[31m[terragrunt] exemples/debian12.pkrvars.hcl - ERROR - 1 error(s)[0m
+[31m--Error detail:
+time=2023-10-28T12:59:20Z level=error msg=Invalid file format /builds/packer/packer-proxmox_template/exemples/debian12.pkrvars.hcl
+time=2023-10-28T12:59:20Z level=error msg=Unable to determine underlying exit code, so Terragrunt will exit with error code 1
+[0m
+[0Ksection_end:`1698497960902304612`:processed-TERRAFORM_TERRAGRUNT[0K
+[0Ksection_start:`1698497961392494747`:processed-MARKDOWN_MARKDOWN_TABLE_FORMATTER[collapsed=true][0K[32m✅ Linted [MARKDOWN] files with [markdown-table-formatter] successfully - (0.41s)[0m (expand for details)
+- Using [markdown-table-formatter v1.4.0] https://megalinter.io/7.4.0/descriptors/markdown_markdown_table_formatter
+- MegaLinter key: [MARKDOWN_MARKDOWN_TABLE_FORMATTER]
+- Rules config: identified by [markdown-table-formatter]
+- Number of files analyzed: [1]
+[0Ksection_end:`1698497961395571830`:processed-MARKDOWN_MARKDOWN_TABLE_FORMATTER[0K
+[0Ksection_start:`1698497961463287519`:processed-MARKDOWN_MARKDOWNLINT[collapsed=true][0K[33m✅ Linted [MARKDOWN] files with [markdownlint]: Found 3 non blocking error(s) - (0.48s)[0m (expand for details)
+- Using [markdownlint v0.37.0] https://megalinter.io/7.4.0/descriptors/markdown_markdownlint
+- MegaLinter key: [MARKDOWN_MARKDOWNLINT]
+- Rules config: [.markdownlint.json]
+- Number of files analyzed: [1]
+--Error detail:
+README.md:2 MD041/first-line-heading/first-line-h1 First line in a file should be a top-level heading [Context: "## Install packer on linux min..."]
+README.md:5:10 MD034/no-bare-urls Bare URL used [Context: "https://apt.releases.hashicorp..."]
+README.md:6:73 MD034/no-bare-urls Bare URL used [Context: "https://apt.releases.hashicorp..."]
+
+[0Ksection_end:`1698497961465929999`:processed-MARKDOWN_MARKDOWNLINT[0K
+[0Ksection_start:`1698497961683885618`:processed-MARKDOWN_MARKDOWN_LINK_CHECK[collapsed=true][0K[32m✅ Linted [MARKDOWN] files with [markdown-link-check] successfully - (0.7s)[0m (expand for details)
+- Using [markdown-link-check v3.11.2] https://megalinter.io/7.4.0/descriptors/markdown_markdown_link_check
+- MegaLinter key: [MARKDOWN_MARKDOWN_LINK_CHECK]
+- Rules config: [.markdown-link-check.json]
+- Number of files analyzed: [1]
+[0Ksection_end:`1698497961685915430`:processed-MARKDOWN_MARKDOWN_LINK_CHECK[0K
+
++----SUMMARY---+--------------------------+---------------+-------+-------+--------+--------------+
+| Descriptor   | Linter                   | Mode          | Files | Fixed | Errors | Elapsed time |
++--------------+--------------------------+---------------+-------+-------+--------+--------------+
+| ⚠️ MARKDOWN  | markdownlint             | list_of_files |     1 |       |      3 |        0.48s |
+| ✅ MARKDOWN  | markdown-link-check      | list_of_files |     1 |       |      0 |         0.7s |
+| ✅ MARKDOWN  | markdown-table-formatter | list_of_files |     1 |       |      0 |        0.41s |
+| ❌ TERRAFORM | terragrunt               | file          |     3 |       |      1 |        0.18s |
++--------------+--------------------------+---------------+-------+-------+--------+--------------+
+
+[34mYou could have same capabilities but better runtime performances if you use a MegaLinter flavor:[0m
+- [terraform] oxsecurity/megalinter/flavors/terraform@v7 (55 linters) https://megalinter.io/7.4.0/flavors/terraform/
+- [cupcake] oxsecurity/megalinter/flavors/cupcake@v7 (85 linters) https://megalinter.io/7.4.0/flavors/cupcake/
+
+Unable to connect to GitHub repository: None
+[Updated Sources Reporter] No source file has been formatted or fixed
+[Gitlab Comment Reporter] No merge request has been found, so no comment has been posted
+[31m❌ Error(s) have been found during linting[0m
+To disable linters or customize their checks, you can use a .mega-linter.yml file at the root of your repository
+More info at https://megalinter.io/7.4.0/configuration/
