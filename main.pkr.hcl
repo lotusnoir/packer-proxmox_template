@@ -70,7 +70,14 @@ variable "iso_target_path" {
 variable "iso_storage_pool" {
   description = "Proxmox storage pool onto which to upload the ISO file."
   type        = string
+  default     = null
 }
+
+variable "iso_file" {
+  type    = string
+  default = null
+}
+
 
 
 #################################################
@@ -112,7 +119,7 @@ variable "vm_cores" {
 variable "vm_cpu_type" {
   description = "How many CPU sockets to give the virtual machine."
   type        = string
-  default     = "kvm64"
+  default     = "host"
 }
 
 variable "vm_sockets" {
@@ -130,7 +137,7 @@ variable "vm_numa" {
 variable "vm_os" {
   description = "The operating system. Can be wxp, w2k, w2k3, w2k8, wvista, win7, win8, win10, l24 (Linux 2.4), l26 (Linux 2.6+), solaris or other."
   type        = string
-  default     = "other"
+  default     = "l26"
 }
 
 variable "boot_order" {
@@ -171,7 +178,6 @@ variable "boot_wait" {
 variable "boot_command" {
   type        = list(string)
   description = "boot command instructions"
-  default     = []
 }
 
 variable "root_password" {
@@ -194,6 +200,28 @@ variable "http_proxy" {
   default = ""
 }
 
+variable "boot_filename" {
+  type = string
+}
+
+variable "template_net_ip" {
+  type    = string
+  default = ""
+}
+variable "template_net_gateway" {
+  type    = string
+  default = ""
+}
+
+variable "template_net_netmask" {
+  type    = string
+  default = ""
+}
+
+variable "template_net_dns" {
+  type    = string
+  default = ""
+}
 
 variable "http_port_min" {
   type    = number
@@ -238,6 +266,14 @@ variable "disk_type" {
   default = "scsi"
 }
 
+variable "scsi_controller" {
+  type    = string
+  default = "virtio-scsi-pci"
+}
+variable "qemu_agent" {
+  type    = bool
+  default = true
+}
 ###########################################
 ### Ansible vars
 variable "ansible_path" {
@@ -258,7 +294,7 @@ variable "ansible_groups" {
 ##########################################################
 ## CLONE PARAMS
 ##########################################################
-source "proxmox-iso" "debian" {
+source "proxmox-iso" "this" {
   ### proxmox hypervisor config
   proxmox_url              = "https://${var.proxmox_host}/api2/json"
   insecure_skip_tls_verify = var.proxmox_skip_tls
@@ -270,12 +306,14 @@ source "proxmox-iso" "debian" {
 
   ### Misc config
   task_timeout = var.task_timeout
+  qemu_agent   = var.qemu_agent
 
   ### Image config
   iso_url          = var.iso_url
   iso_checksum     = var.iso_checksum
   iso_storage_pool = var.iso_storage_pool
   iso_target_path  = var.iso_target_path
+  iso_file         = var.iso_file
 
   ### VM config
   vm_name              = var.vm_name
@@ -291,7 +329,7 @@ source "proxmox-iso" "debian" {
   machine              = var.vm_machine_type
   template_name        = var.template_name
   template_description = var.template_description
-  #scsi_controller = "lsi"
+  scsi_controller      = var.scsi_controller
   disks {
     disk_size    = var.disk_size
     format       = var.disk_format
@@ -305,9 +343,9 @@ source "proxmox-iso" "debian" {
     pre_enrolled_keys = true
   }
   network_adapters {
-    bridge = "vmbr0"
-    #firewall = true
-    model = "virtio"
+    bridge   = "vmbr0"
+    model    = "virtio"
+    firewall = false
     #vlan_tag = ""
   }
 
@@ -319,11 +357,16 @@ source "proxmox-iso" "debian" {
   http_port_min = var.http_port_min
   http_port_max = var.http_port_max
   http_content = {
-    "/preseed.cfg" = templatefile(var.autoinstall_file_path, {
-      root_password = var.root_password,
-      ssh_username  = var.ssh_username,
-      ssh_password  = var.ssh_password,
-      http_proxy    = var.http_proxy
+    "/${var.boot_filename}" = templatefile(var.autoinstall_file_path, {
+      root_password        = var.root_password,
+      ssh_username         = var.ssh_username,
+      ssh_password         = var.ssh_password,
+      template_net_ip      = var.template_net_ip,
+      template_net_gateway = var.template_net_gateway,
+      template_net_netmask = var.template_net_netmask,
+      template_net_dns     = var.template_net_dns,
+      http_proxy           = var.http_proxy
+
     })
   }
 
@@ -337,7 +380,7 @@ source "proxmox-iso" "debian" {
 }
 
 build {
-  sources = ["source.proxmox-iso.debian"]
+  sources = ["source.proxmox-iso.this"]
 
   #  provisioner "ansible" {
   #    playbook_file    	= "${var.ansible_path}/playbooks/${var.ansible_playbook}"
