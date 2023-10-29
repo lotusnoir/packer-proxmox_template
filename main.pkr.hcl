@@ -382,18 +382,18 @@ source "proxmox-iso" "this" {
 build {
   sources = ["source.proxmox-iso.this"]
 
-  #  provisioner "ansible" {
-  #    playbook_file    	= "${var.ansible_path}/playbooks/${var.ansible_playbook}"
-  #    roles_path       	= "${var.ansible_path}/roles/base"
-  #    inventory_directory = "${var.ansible_path}/inventory"
-  #    user             	= "${var.ssh_username}"
-  #    groups           	= "${var.ansible_groups}"
-  #    host_alias          = "${var.vm_name}"
-  #    #extra_arguments     = [ "--limit=!packer_test"]
-  #    ansible_env_vars 	= [
-  #      "ANSIBLE_CONFIG=${var.ansible_path}/ansible.cfg",
-  #      "ANSIBLE_FORCE_COLOR=1",
-  #      "PACKER_BUILD_NAME=${var.vm_name}"
-  #    ]
-  #  }
+  provisioner "ansible" {
+    playbook_file    	= "${var.ansible_path}/playbooks/${var.ansible_playbook}"
+    roles_path       	= "${var.ansible_path}/roles/base"
+    inventory_directory = "${var.ansible_path}/inventory"
+    user             	= "${var.ssh_username}"
+    groups           	= "${var.ansible_groups}"
+    host_alias          = "${var.vm_name}"
+    #extra_arguments     = [ "--limit=!packer_test"]
+    ansible_env_vars 	= [
+      "ANSIBLE_CONFIG=${var.ansible_path}/ansible.cfg",
+      "ANSIBLE_FORCE_COLOR=1",
+      "PACKER_BUILD_NAME=${var.vm_name}"
+    ]
+  }
 }

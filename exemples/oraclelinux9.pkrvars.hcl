@@ -80,5 +80,5 @@ template_net_dns     = "1.1.1.1"
 
 
 ### Provisionning Ansible
-ansible_path   = "/opt/ansible_core"
+ansible_path   = "/opt/ansible"
 ansible_groups = ["site_home", "os_oraclelinux9", "groups_templates"]

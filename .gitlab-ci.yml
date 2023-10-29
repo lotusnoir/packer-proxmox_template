@@ -24,7 +24,7 @@ mega-linter:
 packer-validation:
   stage: validate
   image:
-    name: hashicorp/packer:light
+    name: lotusnoir/packer_play
     entrypoint:
       - '/usr/bin/env'
       - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
@@ -32,6 +32,9 @@ packer-validation:
     - if: $CI_PIPELINE_SOURCE == "push"
   before_script: 
     - git clone https://github.com/lotusnoir/packer-unattended_distrib_files.git
+    - mkdir -p /tmp/playbooks && touch /tmp/playbooks/packer.yml
+    - mkdir -p /tmp/inventory
+    - mkdir -p /tmp/roles/base
   script:
     - echo "Validating Packer templates"
     - packer --version

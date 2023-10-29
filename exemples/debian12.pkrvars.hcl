@@ -82,5 +82,5 @@ ssh_password         = "test"
 
 
 ### Provisionning Ansible
-ansible_path   = "/opt/ansible_core"
+ansible_path   = "/tmp"
 ansible_groups = ["site_home", "os_debian12", "groups_templates"]
