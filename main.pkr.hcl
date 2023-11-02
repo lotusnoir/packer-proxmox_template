@@ -78,6 +78,16 @@ variable "iso_file" {
   default = null
 }
 
+variable "cloud_init" {
+  type    = bool
+  default = false
+}
+
+variable "cloud_init_storage_pool" {
+  type    = string
+  default = null
+}
+
 
 
 #################################################
@@ -399,6 +409,10 @@ source "proxmox-iso" "this" {
 
     })
   }
+
+  cloud_init = var.cloud_init
+  cloud_init_storage_pool = var.cloud_init_storage_pool
+
 
   ### Connection config
   ssh_username = var.ssh_username
