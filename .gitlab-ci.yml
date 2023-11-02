@@ -32,9 +32,7 @@ packer-validation:
     - if: $CI_PIPELINE_SOURCE == "push"
   before_script: 
     - git clone https://github.com/lotusnoir/packer-unattended_distrib_files.git
-    - mkdir -p /tmp/playbooks && touch /tmp/playbooks/packer.yml
-    - mkdir -p /tmp/inventory
-    - mkdir -p /tmp/roles/base
+    - mkdir -p /tmp/ansible/{playbooks,inventory,roles/base} && touch /tmp/ansible/playbooks/packer.yml
   script:
     - echo "Validating Packer templates"
     - packer --version

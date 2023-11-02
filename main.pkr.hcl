@@ -192,7 +192,7 @@ variable "ssh_password" {
 
 variable "ssh_username" {
   type    = string
-  default = ""
+  default = "admin"
 }
 
 variable "http_proxy" {
@@ -204,23 +204,48 @@ variable "boot_filename" {
   type = string
 }
 
-variable "template_net_ip" {
+variable "net_ip" {
   type    = string
   default = ""
 }
-variable "template_net_gateway" {
-  type    = string
-  default = ""
-}
-
-variable "template_net_netmask" {
+variable "net_gateway" {
   type    = string
   default = ""
 }
 
-variable "template_net_dns" {
+variable "net_netmask" {
   type    = string
-  default = ""
+  default = "255.255.255.0"
+}
+
+variable "net_dns" {
+  type    = string
+  default = "8.8.8.8"
+}
+
+variable "timezone" {
+  type    = string
+  default = "Europe/Paris"
+}
+
+variable "locales" {
+  type    = string
+  default = "en_US.UTF-8"
+}
+
+variable "keyboard_layout" {
+  type    = string
+  default = "us"
+}
+
+variable "disk_boot_size" {
+  type    = number
+  default = "640"
+}
+
+variable "disk_swap_size" {
+  type    = number
+  default = "1024"
 }
 
 variable "http_port_min" {
@@ -361,10 +386,15 @@ source "proxmox-iso" "this" {
       root_password        = var.root_password,
       ssh_username         = var.ssh_username,
       ssh_password         = var.ssh_password,
-      template_net_ip      = var.template_net_ip,
-      template_net_gateway = var.template_net_gateway,
-      template_net_netmask = var.template_net_netmask,
-      template_net_dns     = var.template_net_dns,
+      net_ip               = var.net_ip,
+      net_gateway          = var.net_gateway,
+      net_netmask          = var.net_netmask,
+      net_dns              = var.net_dns,
+      timezone             = var.timezone,
+      locales              = var.locales,
+      keyboard_layout      = var.keyboard_layout,
+      disk_swap_size       = var.disk_swap_size,
+      disk_boot_size       = var.disk_boot_size,
       http_proxy           = var.http_proxy
 
     })

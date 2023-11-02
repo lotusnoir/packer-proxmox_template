@@ -57,14 +57,11 @@ scsi_controller = "virtio-scsi-pci"
 ### Install variables
 #boot_key_interval = "5ms"
 #boot_wait = "10s"
-boot_filename = "ks9.cfg"
-boot_command  = ["<tab> inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks9.cfg <enter><wait>"]
+boot_filename = "ks.cfg"
+boot_command  = ["<tab> inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg <enter><wait>"]
 #http_port_min = 8080
 #http_port_max = 8080
-autoinstall_file_path = "packer-unattended_distrib_files/linux/oraclelinux/ks9.pkrtpl"
-
-
-
+autoinstall_file_path = "packer-unattended_distrib_files/linux/oraclelinux/ks.pkrtpl"
 
 ### System variables
 template_name        = "template-linux-oraclelinux-9"
@@ -73,12 +70,17 @@ root_password        = "test"
 ssh_username         = "white"
 ssh_password         = "test"
 #http_proxy            = ""
-template_net_ip      = "192.168.49.34"
-template_net_gateway = "192.168.48.1"
-template_net_netmask = "255.255.240.0"
-template_net_dns     = "1.1.1.1"
+net_ip      = "192.168.49.34"
+net_gateway = "192.168.48.1"
+net_netmask = "255.255.240.0"
+net_dns     = "1.1.1.1"
+timezone         = "Europe/Paris"
+locales          = "en_US.UTF-8" 
+keyboard_layout  = "us"
+disk_swap_size   = "1024"
+disk_boot_size   = "640"
 
 
 ### Provisionning Ansible
-ansible_path   = "/opt/ansible"
+ansible_path   = "/tmp/ansible"
 ansible_groups = ["site_home", "os_oraclelinux9", "groups_templates"]

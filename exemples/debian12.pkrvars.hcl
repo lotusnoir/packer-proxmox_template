@@ -14,11 +14,9 @@ proxmox_password = "packer"
 #proxmox_pool     = ""
 #proxmox_token    = "xxxxxxxxx"
 
-
 ### Misc variables
 task_timeout = "5m"
 unmount_iso  = true
-
 
 ### Image variables
 #iso_url          = "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.2.0-amd64-netinst.iso"
@@ -26,7 +24,6 @@ unmount_iso  = true
 #iso_storage_pool = "local"
 #iso_target_path  = "isos_cache"
 iso_file = "local:iso/debian-12.2.0-amd64-netinst.iso"
-
 
 ### VM variables
 vm_name   = "debian-12"
@@ -71,7 +68,6 @@ boot_command = [
 #http_port_max = 8080
 autoinstall_file_path = "packer-unattended_distrib_files/linux/debian/preseed.pkrtpl"
 
-
 ### System variables
 template_name        = "template-linux-debian-12-test"
 template_description = "debian-12.2.0"
@@ -79,8 +75,12 @@ root_password        = "test"
 ssh_username         = "white"
 ssh_password         = "test"
 #http_proxy            = ""
-
+timezone         = "Europe/Paris"
+locales          = "en_US.UTF-8"
+keyboard_layout  = "us"
+disk_swap_size   = "1024"                                                                                                                                                                                           
+disk_boot_size   = "640"
 
 ### Provisionning Ansible
-ansible_path   = "/tmp"
+ansible_path   = "/tmp/ansible"
 ansible_groups = ["site_home", "os_debian12", "groups_templates"]
