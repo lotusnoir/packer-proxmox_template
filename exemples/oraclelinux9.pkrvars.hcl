@@ -1,5 +1,5 @@
 #----------------------------------------------------------------------------------
-# Variable definition file to build the OracleLinux 9 image 
+# Variable definition file to build the OracleLinux 9 image
 #----------------------------------------------------------------------------------
 #https://yum.oracle.com/oracle-linux-isos.html
 #https://linux.oracle.com/security/gpg/checksum/
@@ -70,15 +70,15 @@ root_password        = "test"
 ssh_username         = "white"
 ssh_password         = "test"
 #http_proxy            = ""
-net_ip      = "192.168.49.34"
-net_gateway = "192.168.48.1"
-net_netmask = "255.255.240.0"
-net_dns     = "1.1.1.1"
-timezone         = "Europe/Paris"
-locales          = "en_US.UTF-8" 
-keyboard_layout  = "us"
-disk_swap_size   = "1024"
-disk_boot_size   = "640"
+net_ip          = "192.168.49.34"
+net_gateway     = "192.168.48.1"
+net_netmask     = "255.255.240.0"
+net_dns         = "1.1.1.1"
+timezone        = "Europe/Paris"
+locales         = "en_US.UTF-8"
+keyboard_layout = "us"
+disk_swap_size  = "1024"
+disk_boot_size  = "640"
 
 
 ### Provisionning Ansible

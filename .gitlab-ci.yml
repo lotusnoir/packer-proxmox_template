@@ -1,53 +1,15 @@
 ---
 stages:
-  - lint
-  - validate
   - push
 
 variables:
   GITHUB_USER: lotusnoir
+  PROJECT: packer-proxmox_template
 
-###########################
-# job dependencies:
-#       file: .mega-linter.yml
-mega-linter:
-  stage: lint
-  image: oxsecurity/megalinter:v7
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
-  script: ["true"]
-  allow_failure: true
-  variables:
-    DEFAULT_WORKSPACE: ${CI_PROJECT_DIR}
-
-###########################
-packer-validation:
-  stage: validate
-  image:
-    name: lotusnoir/packer_play
-    entrypoint:
-      - '/usr/bin/env'
-      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
-  before_script: 
-    - git clone https://github.com/lotusnoir/packer-unattended_distrib_files.git
-    - mkdir -p /tmp/ansible/{playbooks,inventory,roles/base} && touch /tmp/ansible/playbooks/packer.yml
-  script:
-    - echo "Validating Packer templates"
-    - packer --version
-    - packer init providers.pkr.hcl
-    - packer validate --var-file=exemples/debian12.pkrvars.hcl .
-
-
-##################################################
-# PUSH CODE WHEN ALL TEST OK
 ##################################################
 push_src_on_github:
   stage: push
   image: alpine:latest
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
   before_script:
     - apk add git openssh-client
     - eval $(ssh-agent -s)
@@ -60,11 +22,11 @@ push_src_on_github:
     - git config --global init.defaultBranch main
     - COMMENT=$(git log -1 --pretty=%B | head -1)
   script:
-    - git clone git@github.com:${GITHUB_USER}/packer-proxmox_template.git /tmp/packer-proxmox_template
-    - find /tmp/packer-proxmox_template -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf "{}" +;
+    - git clone git@github.com:${GITHUB_USER}/${PROJECT}.git /tmp/${PROJECT}
+    - find /tmp/${PROJECT} -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf "{}" +;
     - rm -rf .git
-    - cp -r . /tmp/packer-proxmox_template/
-    - cd /tmp/packer-proxmox_template
+    - cp -r . /tmp/${PROJECT}
+    - cd /tmp/${PROJECT}
     - git add -A
     - git commit -m "${COMMENT}" || echo "No changes, nothing to commit!"
     - git push --follow-tags

@@ -66,7 +66,7 @@ boot_command = [
 ]
 #http_port_min = 8080
 #http_port_max = 8080
-autoinstall_file_path = "exemples/preseed.pkrtpl"
+autoinstall_file_path = "../../modules/packer-unattended_distrib_files/linux/debian/preseed_standalone.pkrtpl"
 
 ### System variables
 template_name        = "template-linux-debian-12-test"
