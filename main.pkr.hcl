@@ -200,6 +200,11 @@ variable "root_password" {
   sensitive = true
 }
 
+variable "filesystem_type" {
+  type    = string
+  default = "ext4"
+}
+
 variable "ssh_password" {
   type      = string
   sensitive = true
@@ -402,6 +407,7 @@ source "proxmox-iso" "this" {
   http_port_max = var.http_port_max
   http_content = {
     "/${var.boot_filename}" = templatefile(var.autoinstall_file_path, {
+      filesystem_type = var.filesystem_type,
       root_password   = var.root_password,
       ssh_username    = var.ssh_username,
       ssh_password    = var.ssh_password,
