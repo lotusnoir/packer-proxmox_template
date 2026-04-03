@@ -1,0 +1,452 @@
+#################################################
+### Iso variables
+#################################################
+variable "iso_type" {
+  type    = string
+  default = "scsi"
+}
+
+variable "iso_url" {
+  description = "A URL to the ISO containing the installation image or virtual hard drive (VHD or VHDX) file to clone"
+  type        = string
+  default     = ""
+}
+
+variable "iso_urls" {
+  description = "Multiple URLs for the ISO to download. Packer will try these in order. If anything goes wrong attempting to download or while downloading a single URL, it will move on to the next. All URLs must point to the same file (same checksum). By default this is empty and iso_url is used. Only one of iso_url or iso_urls can be specified."
+  type        = list(string)
+  default     = []
+}
+
+variable "iso_checksum" {
+  description = "The checksum for the ISO file or virtual hard drive file. The type of the checksum is specified within the checksum field as a prefix. The type of the checksum can also be omitted and Packer will try to infer it based on string length."
+  type        = string
+  default     = ""
+}
+
+variable "iso_storage_pool" {
+  description = "Proxmox storage pool onto which to upload the ISO file."
+  type        = string
+  default     = null
+}
+
+variable "iso_target_path" {
+  description = "The path where the iso should be saved after download. By default will go in the packer cache, with a hash of the original filename and checksum as its name."
+  type        = string
+  default     = null
+}
+
+variable "iso_file" {
+  type    = string
+  default = null
+}
+
+variable "iso_unmount" {
+  description = "Remove the mounted ISO from the template after finishing."
+  type        = bool
+  default     = true
+}
+
+
+#################################################
+### boot variables
+#################################################
+variable "boot_key_interval" {
+  description = "Boot Key Interval."
+  type        = string
+  default     = "5ms"
+}
+
+variable "boot_order" {
+  description = "Override default boot order. Format example order=virtio0;ide2;net0. Prior to Proxmox 6.2-15 the format was cdn (c:CDROM -> d:Disk -> n:Network)"
+  type        = string
+  default     = "cdn"
+}
+
+variable "boot_wait" {
+  type    = string
+  default = "10s"
+}
+
+variable "boot_command" {
+  type        = list(string)
+  description = "boot command instructions"
+}
+
+variable "http_interface" {
+  type    = string
+  default = null
+}
+
+variable "http_bind_address" {
+  type    = string
+  default = null
+}
+
+variable "http_network_protocol" {
+  type    = string
+  default = null
+}
+
+variable "http_port_min" {
+  type    = number
+  default = 8000
+}
+
+variable "http_port_max" {
+  type    = number
+  default = 9000
+}
+
+variable "boot_autoinstall_file_name" {
+  type    = string
+  default = null
+}
+
+variable "boot_autoinstall_file_path" {
+  type    = string
+  default = null
+}
+
+
+
+
+#################################################
+### hypervisor variables
+#################################################
+variable "proxmox_url" {
+  description = "URL to the Proxmox API, fqdn or ip:port."
+  type        = string
+}
+
+variable "proxmox_skip_tls" {
+  description = "Skip validating the certificate."
+  type        = bool
+  default     = false
+}
+
+variable "proxmox_node" {
+  description = "Which node in the Proxmox cluster to start the virtual machine on during creation."
+  type        = string
+}
+
+variable "proxmox_pool" {
+  description = "Name of resource pool to create virtual machine in."
+  type        = string
+  default     = null
+}
+
+variable "proxmox_username" {
+  description = "Username when authenticating to Proxmox, including the realm"
+  type        = string
+}
+
+variable "proxmox_password" {
+  description = "Password for the user."
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+variable "proxmox_token" {
+  description = "Token for authenticating API calls. This allows the API client to work with API tokens instead of user passwords. "
+  type        = string
+  default     = null
+}
+
+
+
+
+#################################################
+### hypervisor variables
+#################################################
+
+
+#################################################
+variable "task_timeout" {
+  description = "The timeout for Promox API operations, e.g. clones."
+  type        = string
+  default     = "1m"
+}
+
+
+
+#################################################
+### hypervisor variables
+#################################################
+
+#################################################
+variable "network_adapters_bridge" {
+  type    = string
+  default = "vmbr0"
+}
+variable "network_adapters_model" {
+  type    = string
+  default = "virtio"
+}
+variable "network_adapters_firewall" {
+  type    = bool
+  default = false
+}
+#################################################
+variable "cloud_init" {
+  type    = bool
+  default = false
+}
+
+variable "cloud_init_storage_pool" {
+  type    = string
+  default = null
+}
+
+
+
+#################################################
+variable "vm_name" {
+  description = "Name of the virtual machine during creation. If not given, a random uuid will be used."
+  type        = string
+}
+
+variable "vm_id" {
+  description = "The ID used to reference the virtual machine. This will also be the ID of the final template. Proxmox VMIDs are unique cluster-wide and are limited to the range 100-999999999. If not given, the next free ID on the cluster will be used."
+  type        = number
+  default     = 0
+}
+
+variable "vm_memory" {
+  description = "How much memory (in megabytes) to give the virtual machine. If ballooning_minimum is also set, memory defines the maximum amount of memory the VM will be able to use."
+  type        = number
+  default     = 512
+}
+
+variable "vm_ballooning_minimum" {
+  description = "Setting this option enables KVM memory ballooning and defines the minimum amount of memory (in megabytes) the VM will have."
+  type        = number
+  default     = 0
+}
+
+variable "vm_cores" {
+  description = "How many CPU cores to give the virtual machine."
+  type        = number
+  default     = 1
+}
+
+variable "vm_cpu_type" {
+  description = "How many CPU sockets to give the virtual machine."
+  type        = string
+  default     = "host"
+}
+
+variable "vm_sockets" {
+  description = "How many CPU sockets to give the virtual machine."
+  type        = number
+  default     = 1
+}
+
+variable "vm_numa" {
+  description = "support for non-uniform memory access (NUMA) is enabled."
+  type        = bool
+  default     = false
+}
+
+variable "vm_os" {
+  description = "The operating system. Can be wxp, w2k, w2k3, w2k8, wvista, win7, win8, win10, l24 (Linux 2.4), l26 (Linux 2.6+), solaris or other."
+  type        = string
+  default     = "l26"
+}
+
+variable "vm_bios" {
+  type    = string
+  default = "seabios"
+}
+
+variable "vm_efi_config" {
+  type    = map(string)
+  default = null
+}
+
+variable "vm_machine_type" {
+  type    = string
+  default = ""
+}
+
+variable "template_name" {
+  type = string
+}
+
+variable "template_description" {
+  type = string
+}
+
+variable "disk_format" {
+  type    = string
+  default = "raw"
+}
+
+variable "disk_io_thread" {
+  type    = bool
+  default = false
+}
+
+variable "disk_storage_pool" {
+  type = string
+}
+
+variable "disk_type" {
+  type    = string
+  default = "scsi"
+}
+
+variable "disk_efi_storage_pool" {
+  type    = string
+  default = "local-lvm"
+}
+
+variable "disk_efi_pre_enrolled_keys" {
+  type    = bool
+  default = true
+}
+
+variable "disk_efi_format" {
+  type    = string
+  default = "raw"
+}
+variable "disk_efi_type" {
+  type    = string
+  default = "4m"
+}
+variable "scsi_controller" {
+  type    = string
+  default = "virtio-scsi-pci"
+}
+variable "qemu_agent" {
+  type    = bool
+  default = true
+}
+
+#################################################
+### Provisioner variables
+#################################################
+variable "ansible_path" {
+  type = string
+}
+
+variable "ansible_playbook" {
+  type    = string
+  default = "packer.yml"
+}
+
+variable "ansible_groups" {
+  type    = list(string)
+  default = []
+}
+
+
+#################################################
+### Custom variables
+#################################################
+variable "root_password" {
+  type      = string
+  sensitive = true
+}
+
+variable "filesystem_type" {
+  type    = string
+  default = "ext4"
+}
+
+variable "ssh_password" {
+  type      = string
+  sensitive = true
+}
+
+variable "ssh_username" {
+  type    = string
+  default = "admin"
+}
+
+variable "http_proxy" {
+  type    = string
+  default = ""
+}
+
+variable "net_ip" {
+  type    = string
+  default = ""
+}
+variable "net_gateway" {
+  type    = string
+  default = ""
+}
+
+variable "net_netmask" {
+  type    = string
+  default = "255.255.255.0"
+}
+
+variable "net_dns" {
+  type    = string
+  default = "8.8.8.8"
+}
+
+variable "timezone" {
+  type    = string
+  default = "Europe/Paris"
+}
+
+variable "locales" {
+  type    = string
+  default = "en_US.UTF-8"
+}
+
+variable "keyboard_layout" {
+  type    = string
+  default = "us"
+}
+
+variable "disk_boot_size" {
+  type    = number
+  default = "640"
+}
+
+variable "disk_swap_size" {
+  type    = number
+  default = "1024"
+}
+
+variable "disk_size" {
+  type = string
+}
+
+
+variable "internet_install" {
+  type    = bool
+  default = true
+}
+variable "major_version" {
+  type    = string
+  default = "9"
+}
+
+
+variable "secrets_method" {
+  type    = string
+  default = "plain" #or vault
+}
+
+variable "vault_kv_path" {
+  type    = string
+  default = ""
+}
+
+variable "winrm_username" {
+  type        = string
+  description = "The username to use to connect to WinRM."
+  default     = "Administrateur"
+}
+
+variable "winrm_password" {
+  type        = string
+  description = "The password to use to connect to WinRM."
+  default     = null
+}

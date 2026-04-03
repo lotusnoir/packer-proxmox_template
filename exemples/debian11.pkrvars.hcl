@@ -6,7 +6,7 @@
 # https://cdimage.debian.org/mirror/cdimage/archive/
 
 ### proxmox hypervisor variables
-proxmox_host     = "192.168.51.1:8006"
+proxmox_url      = "https://192.168.51.1:8006/api2/json"
 proxmox_skip_tls = true
 proxmox_node     = "geekom"
 proxmox_username = "packer@pve"
@@ -16,7 +16,7 @@ proxmox_password = "packer"
 
 ### Misc variables
 task_timeout = "5m"
-unmount_iso  = true
+iso_unmount  = true
 
 ### Image variables
 #iso_url          = "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.2.0-amd64-netinst.iso"
@@ -50,7 +50,7 @@ scsi_controller = "virtio-scsi-pci"
 ### Install variables
 #boot_key_interval = "5ms"
 #boot_wait = "10s"
-boot_filename = "preseed.cfg"
+boot_autoinstall_file_name = "preseed.cfg"
 boot_command = [
   "<esc><wait>",
   "auto <wait>",
@@ -66,7 +66,7 @@ boot_command = [
 ]
 #http_port_min = 8080
 #http_port_max = 8080
-autoinstall_file_path = "../../modules/packer-unattended_distrib_files/linux/debian/preseed_standalone.pkrtpl"
+boot_autoinstall_file_path = "../../modules/packer-unattended_distrib_files/linux/debian/preseed_standalone.pkrtpl"
 
 ### System variables
 template_name        = "template-linux-debian-12-test"
