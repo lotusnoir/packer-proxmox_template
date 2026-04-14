@@ -42,6 +42,7 @@ source "proxmox-iso" "this" {
       keyboard_layout  = var.keyboard_layout
       disk_swap_size   = var.disk_swap_size
       disk_boot_size   = var.disk_boot_size
+      disk_name        = var.disk_name
       http_proxy       = var.http_proxy
       major_version    = var.major_version
       winrm_username   = local.winrm_username
@@ -115,11 +116,13 @@ build {
     playbook_file       = "${var.ansible_path}/playbooks/${var.ansible_playbook}"
     roles_path          = "${var.ansible_path}/roles/base"
     inventory_directory = "${var.ansible_path}/inventory"
-    user                = "${var.ssh_username}"
+    user                = var.communicator == "ssh" ? "${local.ssh_username}" : "${local.winrm_username}"
     groups              = "${var.ansible_groups}"
     host_alias          = "${var.vm_name}"
-    #extra_arguments     = [ "--limit=!packer_test"]
+    use_proxy           = false
+    extra_arguments     = var.communicator == "ssh" ? ["--extra-vars", "ansible_ssh_pass=${local.ssh_password}"] : ["-e", "ansible_winrm_server_cert_validation=ignore"]
     ansible_env_vars = [
+      "ANSIBLE_HOST_KEY_CHECKING=False",
       "ANSIBLE_CONFIG=${var.ansible_path}/ansible.cfg",
       "ANSIBLE_FORCE_COLOR=1",
       "PACKER_BUILD_NAME=${var.vm_name}"

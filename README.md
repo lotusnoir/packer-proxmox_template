@@ -14,3 +14,14 @@ sudo apt update && sudo apt install packer
 
 
     packer build -force --var-file=exemples/debian12.pkrvars.hcl .
+
+
+How it waoks ?
+
+If u use vault, you need to set this variables with valid values:
+
+VAULT_TOKEN=xxxxxxxxxxxxxxxxxxxxxx
+VAULT_ADDR=https://vault.exemple.fr
+
+
+https://developer.hashicorp.com/packer/docs/templates/hcl_templates/functions/contextual/vault

@@ -60,7 +60,7 @@ variable "boot_key_interval" {
 variable "boot_order" {
   description = "Override default boot order. Format example order=virtio0;ide2;net0. Prior to Proxmox 6.2-15 the format was cdn (c:CDROM -> d:Disk -> n:Network)"
   type        = string
-  default     = "cdn"
+  default     = "order=virtio0;scsi0;net0"
 }
 
 variable "boot_wait" {
@@ -355,15 +355,41 @@ variable "filesystem_type" {
   default = "ext4"
 }
 
+### Communicator configuration
+variable "communicator" {
+  type    = string
+  default = "ssh"
+}
+variable "pause_before_connecting" {
+  description = "We recommend that you enable SSH or WinRM as the very last step in your guest's bootstrap script, but sometimes you may have a race condition where you need Packer to wait before attempting to connect to your guest."
+  type        = string
+  default     = null
+}
+variable "ssh_host" {
+  description = "The address to SSH to. This usually is automatically configured by the builder."
+  type        = string
+  default     = ""
+}
+variable "ssh_port" {
+  description = "The port to connect to SSH."
+  type        = string
+  default     = "22"
+}
+variable "ssh_username" {
+  description = "The username to connect to SSH with. Required if using SSH."
+  type        = string
+  default     = "packer"
+}
 variable "ssh_password" {
-  type      = string
-  sensitive = true
+  description = "A plaintext password to use to authenticate with SSH."
+  type        = string
+  sensitive   = true
+  default     = ""
 }
 
-variable "ssh_username" {
-  type    = string
-  default = "admin"
-}
+
+
+
 
 variable "http_proxy" {
   type    = string
@@ -416,6 +442,11 @@ variable "disk_swap_size" {
 
 variable "disk_size" {
   type = string
+}
+
+variable "disk_name" {
+  type    = string
+  default = "sda"
 }
 
 
