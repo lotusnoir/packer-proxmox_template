@@ -14,6 +14,41 @@ source "proxmox-iso" "this" {
     unmount          = var.iso_unmount
   }
 
+  dynamic "additional_iso_files" {
+    for_each = var.additional_iso_files != null ? [var.additional_iso_files] : []
+    content {
+      iso_storage_pool = additional_iso_files.value.iso_storage_pool
+      device           = additional_iso_files.value.device
+      unmount          = additional_iso_files.value.unmount
+      cd_files         = additional_iso_files.value.cd_files
+      cd_label         = additional_iso_files.value.cd_label
+      cd_content = var.additional_iso_cd_content_file_name == "" ? {} : {
+        "/${var.additional_iso_cd_content_file_name}" = templatefile(var.additional_iso_cd_content_file_path, {
+          vm_name          = var.vm_name
+          internet_install = var.internet_install
+          filesystem_type  = var.filesystem_type
+          root_password    = local.root_password
+          ssh_username     = local.ssh_username
+          ssh_password     = var.additional_iso_cd_content_file_name == "user-data" ? bcrypt("${local.ssh_password}") : local.ssh_password
+          net_ip           = var.net_ip
+          net_gateway      = var.net_gateway
+          net_netmask      = var.net_netmask
+          net_dns          = var.net_dns
+          timezone         = var.timezone
+          locales          = var.locales
+          keyboard_layout  = var.keyboard_layout
+          disk_name        = var.disk_name
+          disk_swap_size   = var.disk_swap_size
+          disk_boot_size   = var.disk_boot_size
+          http_proxy       = var.http_proxy
+          major_version    = var.major_version
+          winrm_username   = local.winrm_username
+          winrm_password   = local.winrm_password
+        })
+      }
+    }
+  }
+
   ### Boot config
   boot_key_interval = var.boot_key_interval
   boot              = var.boot_order
@@ -25,14 +60,15 @@ source "proxmox-iso" "this" {
   #http_network_protocol = var.http_network_protocol
   http_port_min = var.http_port_min
   http_port_max = var.http_port_max
-  http_content = {
-    "/${var.boot_autoinstall_file_name}" = templatefile(var.boot_autoinstall_file_path, {
-      internet_install = var.internet_install
+  http_content = var.http_content_file_name == "" ? {} : {
+    "/${var.http_content_file_name}" = templatefile(var.http_content_file_path, {
       vm_name          = var.vm_name
+      internet_install = var.internet_install
       filesystem_type  = var.filesystem_type
       root_password    = local.root_password
       ssh_username     = local.ssh_username
       ssh_password     = local.ssh_password
+      ssh_password     = var.http_content_file_name == "user-data" ? bcrypt("${local.ssh_password}") : local.ssh_password
       net_ip           = var.net_ip
       net_gateway      = var.net_gateway
       net_netmask      = var.net_netmask
@@ -103,10 +139,37 @@ source "proxmox-iso" "this" {
   cloud_init              = var.cloud_init
   cloud_init_storage_pool = var.cloud_init_storage_pool
 
-  ### Connection config
-  ssh_username = var.ssh_username
-  ssh_password = var.ssh_password
-  ssh_timeout  = "15m"
+  ### Communicator configuration
+  communicator                 = var.communicator
+  pause_before_connecting      = var.pause_before_connecting
+  ssh_host                     = var.ssh_host
+  ssh_port                     = var.ssh_port
+  ssh_username                 = local.ssh_username
+  ssh_password                 = local.ssh_password
+  ssh_ciphers                  = var.ssh_ciphers
+  ssh_clear_authorized_keys    = var.ssh_clear_authorized_keys
+  ssh_key_exchange_algorithms  = var.ssh_key_exchange_algorithms
+  ssh_certificate_file         = var.ssh_certificate_file
+  ssh_pty                      = var.ssh_pty
+  ssh_timeout                  = var.ssh_timeout
+  ssh_disable_agent_forwarding = var.ssh_disable_agent_forwarding
+  ssh_handshake_attempts       = var.ssh_handshake_attempts
+  ssh_bastion_host             = var.ssh_bastion_host
+  ssh_bastion_port             = var.ssh_bastion_port
+  ssh_bastion_agent_auth       = var.ssh_bastion_agent_auth
+  ssh_bastion_username         = var.ssh_bastion_username
+  ssh_bastion_password         = var.ssh_bastion_password
+  ssh_bastion_interactive      = var.ssh_bastion_interactive
+
+  winrm_username = local.winrm_username
+  winrm_password = local.winrm_password
+  winrm_host     = var.winrm_host
+  winrm_no_proxy = var.winrm_no_proxy
+  winrm_port     = var.winrm_port
+  winrm_timeout  = var.winrm_timeout
+  winrm_use_ssl  = var.winrm_use_ssl
+  winrm_insecure = var.winrm_insecure
+  winrm_use_ntlm = var.winrm_use_ntlm
 }
 
 build {

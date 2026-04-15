@@ -49,6 +49,30 @@ variable "iso_unmount" {
 
 
 #################################################
+### Additional Iso variables
+#################################################
+variable "additional_iso_files" {
+  type = list(object({
+    iso_storage_pool = string
+    device           = string
+    cd_files         = string
+    cd_label         = string
+    unmount          = bool
+  }))
+  default = null
+}
+
+variable "additional_iso_cd_content_file_name" {
+  type    = string
+  default = ""
+}
+
+variable "additional_iso_cd_content_file_path" {
+  type    = string
+  default = ""
+}
+
+#################################################
 ### boot variables
 #################################################
 variable "boot_key_interval" {
@@ -73,6 +97,10 @@ variable "boot_command" {
   description = "boot command instructions"
 }
 
+
+#################################################
+### Http variables
+#################################################
 variable "http_interface" {
   type    = string
   default = null
@@ -98,16 +126,114 @@ variable "http_port_max" {
   default = 9000
 }
 
-variable "boot_autoinstall_file_name" {
+variable "http_content_file_name" {
+  type    = string
+  default = ""
+}
+
+variable "http_content_file_path" {
   type    = string
   default = null
 }
 
-variable "boot_autoinstall_file_path" {
+
+#################################################
+### Custom templates http or cd variables
+#################################################
+variable "internet_install" {
+  type    = bool
+  default = true
+}
+variable "filesystem_type" {
   type    = string
-  default = null
+  default = "ext4"
 }
 
+variable "root_password" {
+  type      = string
+  sensitive = true
+}
+variable "ssh_username" {
+  description = "The username to connect to SSH with. Required if using SSH."
+  type        = string
+  default     = "packer"
+}
+variable "ssh_password" {
+  description = "A plaintext password to use to authenticate with SSH."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+variable "net_ip" {
+  type    = string
+  default = ""
+}
+variable "net_gateway" {
+  type    = string
+  default = ""
+}
+
+variable "net_netmask" {
+  type    = string
+  default = "255.255.255.0"
+}
+
+variable "net_dns" {
+  type    = string
+  default = "8.8.8.8"
+}
+
+variable "timezone" {
+  type    = string
+  default = "Europe/Paris"
+}
+
+variable "locales" {
+  type    = string
+  default = "en_US.UTF-8"
+}
+
+variable "keyboard_layout" {
+  type    = string
+  default = "us"
+}
+
+variable "disk_name" {
+  type    = string
+  default = "sda"
+}
+
+variable "disk_boot_size" {
+  type    = number
+  default = "640"
+}
+
+variable "disk_swap_size" {
+  type    = number
+  default = "1024"
+}
+
+variable "http_proxy" {
+  type    = string
+  default = ""
+}
+
+variable "major_version" {
+  type    = string
+  default = "9"
+}
+
+variable "winrm_username" {
+  type        = string
+  description = "The username to use to connect to WinRM."
+  default     = "Administrateur"
+}
+
+variable "winrm_password" {
+  type        = string
+  description = "The password to use to connect to WinRM."
+  default     = null
+}
 
 
 
@@ -158,49 +284,24 @@ variable "proxmox_token" {
 
 
 #################################################
-### hypervisor variables
+### Misc variables
 #################################################
 
-
-#################################################
 variable "task_timeout" {
   description = "The timeout for Promox API operations, e.g. clones."
   type        = string
   default     = "1m"
 }
 
-
-
-#################################################
-### hypervisor variables
-#################################################
-
-#################################################
-variable "network_adapters_bridge" {
-  type    = string
-  default = "vmbr0"
-}
-variable "network_adapters_model" {
-  type    = string
-  default = "virtio"
-}
-variable "network_adapters_firewall" {
+variable "qemu_agent" {
   type    = bool
-  default = false
+  default = true
 }
+
+
+
 #################################################
-variable "cloud_init" {
-  type    = bool
-  default = false
-}
-
-variable "cloud_init_storage_pool" {
-  type    = string
-  default = null
-}
-
-
-
+### VM variables
 #################################################
 variable "vm_name" {
   description = "Name of the virtual machine during creation. If not given, a random uuid will be used."
@@ -260,11 +361,6 @@ variable "vm_bios" {
   default = "seabios"
 }
 
-variable "vm_efi_config" {
-  type    = map(string)
-  default = null
-}
-
 variable "vm_machine_type" {
   type    = string
   default = ""
@@ -275,6 +371,19 @@ variable "template_name" {
 }
 
 variable "template_description" {
+  type = string
+}
+
+
+#################################################
+### DISK
+#################################################
+variable "scsi_controller" {
+  type    = string
+  default = "virtio-scsi-pci"
+}
+
+variable "disk_size" {
   type = string
 }
 
@@ -315,14 +424,204 @@ variable "disk_efi_type" {
   type    = string
   default = "4m"
 }
-variable "scsi_controller" {
+
+#variable "vm_efi_config" {
+#  type    = map(string)
+#  default = null
+#}
+
+
+#################################################
+### Network Adapter
+#################################################
+variable "network_adapters_bridge" {
   type    = string
-  default = "virtio-scsi-pci"
+  default = "vmbr0"
 }
-variable "qemu_agent" {
+variable "network_adapters_model" {
+  type    = string
+  default = "virtio"
+}
+variable "network_adapters_firewall" {
   type    = bool
-  default = true
+  default = false
 }
+
+
+
+
+
+#################################################
+### Cloud init
+#################################################
+variable "cloud_init" {
+  type    = bool
+  default = false
+}
+
+variable "cloud_init_storage_pool" {
+  type    = string
+  default = null
+}
+
+
+#################################################
+### Communicator configuration
+#################################################
+variable "communicator" {
+  type    = string
+  default = "ssh"
+}
+
+variable "pause_before_connecting" {
+  description = "We recommend that you enable SSH or WinRM as the very last step in your guest's bootstrap script, but sometimes you may have a race condition where you need Packer to wait before attempting to connect to your guest."
+  type        = string
+  default     = null
+}
+
+variable "ssh_host" {
+  description = "The address to SSH to. This usually is automatically configured by the builder."
+  type        = string
+  default     = ""
+}
+
+variable "ssh_port" {
+  description = "The port to connect to SSH."
+  type        = string
+  default     = "22"
+}
+variable "ssh_ciphers" {
+  description = "This overrides the value of ciphers supported by default by Golang."
+  type        = list(string)
+  default     = ["aes128-gcm@openssh.com", "chacha20-poly1305@openssh.com", "aes128-ctr", "aes192-ctr", "aes256-ctr", ]
+}
+variable "ssh_clear_authorized_keys" {
+  description = ""
+  type        = bool
+  default     = false
+}
+variable "ssh_key_exchange_algorithms" {
+  description = "If set, Packer will override the value of key exchange (kex) algorithms supported by default by Golang."
+  type        = list(string)
+  default     = []
+}
+variable "ssh_certificate_file" {
+  description = "Path to user certificate used to authenticate with bastion host. The ~ can be used in path and will be expanded to the home directory of current user"
+  type        = string
+  default     = ""
+}
+variable "ssh_pty" {
+  description = "If true, a PTY will be requested for the SSH connection."
+  type        = bool
+  default     = false
+}
+variable "ssh_timeout" {
+  description = "The time to wait for SSH to become available. Packer uses this to determine when the machine has booted so this is usually quite long. "
+  type        = string
+  default     = "5m"
+}
+variable "ssh_disable_agent_forwarding" {
+  description = " If true, SSH agent forwarding will be disabled"
+  type        = bool
+  default     = false
+}
+variable "ssh_handshake_attempts" {
+  description = "The number of handshakes to attempt with SSH once it can connect. "
+  type        = number
+  default     = 10
+}
+variable "ssh_bastion_host" {
+  description = " A bastion host to use for the actual SSH connection."
+  type        = string
+  default     = ""
+}
+variable "ssh_bastion_port" {
+  description = "The port of the bastion host."
+  type        = number
+  default     = "22"
+}
+variable "ssh_bastion_agent_auth" {
+  description = ""
+  type        = bool
+  default     = false
+}
+variable "ssh_bastion_username" {
+  description = ""
+  type        = string
+  default     = ""
+}
+variable "ssh_bastion_password" {
+  description = ""
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+variable "ssh_bastion_interactive" {
+  description = ""
+  type        = bool
+  default     = false
+}
+
+
+#################################################
+### Winrm variables
+#################################################
+variable "winrm_host" {
+  type        = string
+  description = "The address for WinRM to connect to."
+  default     = null
+}
+
+variable "winrm_no_proxy" {
+  type        = bool
+  description = "Setting this to true adds the remote host:port to the NO_PROXY environment variable. This has the effect of bypassing any configured proxies when connecting to the remote host."
+  default     = false
+}
+
+variable "winrm_port" {
+  type        = string
+  description = "The WinRM port to connect to. This defaults to 5985 for plain unencrypted connection and 5986 for SSL when winrm_use_ssl is set to true."
+  default     = "5985"
+}
+
+variable "winrm_timeout" {
+  type        = string
+  description = "The amount of time to wait for WinRM to become available. This defaults to 30m since setting up a Windows machine generally takes a long time."
+  default     = "15m"
+}
+
+variable "winrm_use_ssl" {
+  type        = bool
+  description = "If true, use HTTPS for WinRM."
+  default     = false
+}
+
+variable "winrm_insecure" {
+  type        = bool
+  description = "If true, do not check server certificate chain and host name."
+  default     = false
+}
+
+variable "winrm_use_ntlm" {
+  type        = bool
+  description = "If true, NTLMv2 authentication (with session security) will be used for WinRM, rather than default (basic authentication), removing the requirement for basic authentication to be enabled within the target guest. Further reading for remote connection authentication can be found here."
+  default     = false
+}
+
+
+#################################################
+### Local Secrets variables
+#################################################
+variable "secrets_method" {
+  type    = string
+  default = "plain" #or vault
+}
+
+variable "vault_kv_path" {
+  type    = string
+  default = ""
+}
+
 
 #################################################
 ### Provisioner variables
@@ -339,145 +638,4 @@ variable "ansible_playbook" {
 variable "ansible_groups" {
   type    = list(string)
   default = []
-}
-
-
-#################################################
-### Custom variables
-#################################################
-variable "root_password" {
-  type      = string
-  sensitive = true
-}
-
-variable "filesystem_type" {
-  type    = string
-  default = "ext4"
-}
-
-### Communicator configuration
-variable "communicator" {
-  type    = string
-  default = "ssh"
-}
-variable "pause_before_connecting" {
-  description = "We recommend that you enable SSH or WinRM as the very last step in your guest's bootstrap script, but sometimes you may have a race condition where you need Packer to wait before attempting to connect to your guest."
-  type        = string
-  default     = null
-}
-variable "ssh_host" {
-  description = "The address to SSH to. This usually is automatically configured by the builder."
-  type        = string
-  default     = ""
-}
-variable "ssh_port" {
-  description = "The port to connect to SSH."
-  type        = string
-  default     = "22"
-}
-variable "ssh_username" {
-  description = "The username to connect to SSH with. Required if using SSH."
-  type        = string
-  default     = "packer"
-}
-variable "ssh_password" {
-  description = "A plaintext password to use to authenticate with SSH."
-  type        = string
-  sensitive   = true
-  default     = ""
-}
-
-
-
-
-
-variable "http_proxy" {
-  type    = string
-  default = ""
-}
-
-variable "net_ip" {
-  type    = string
-  default = ""
-}
-variable "net_gateway" {
-  type    = string
-  default = ""
-}
-
-variable "net_netmask" {
-  type    = string
-  default = "255.255.255.0"
-}
-
-variable "net_dns" {
-  type    = string
-  default = "8.8.8.8"
-}
-
-variable "timezone" {
-  type    = string
-  default = "Europe/Paris"
-}
-
-variable "locales" {
-  type    = string
-  default = "en_US.UTF-8"
-}
-
-variable "keyboard_layout" {
-  type    = string
-  default = "us"
-}
-
-variable "disk_boot_size" {
-  type    = number
-  default = "640"
-}
-
-variable "disk_swap_size" {
-  type    = number
-  default = "1024"
-}
-
-variable "disk_size" {
-  type = string
-}
-
-variable "disk_name" {
-  type    = string
-  default = "sda"
-}
-
-
-variable "internet_install" {
-  type    = bool
-  default = true
-}
-variable "major_version" {
-  type    = string
-  default = "9"
-}
-
-
-variable "secrets_method" {
-  type    = string
-  default = "plain" #or vault
-}
-
-variable "vault_kv_path" {
-  type    = string
-  default = ""
-}
-
-variable "winrm_username" {
-  type        = string
-  description = "The username to use to connect to WinRM."
-  default     = "Administrateur"
-}
-
-variable "winrm_password" {
-  type        = string
-  description = "The password to use to connect to WinRM."
-  default     = null
 }

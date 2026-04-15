@@ -57,11 +57,11 @@ scsi_controller = "virtio-scsi-pci"
 ### Install variables
 #boot_key_interval = "5ms"
 #boot_wait = "10s"
-boot_autoinstall_file_name = "ks.cfg"
-boot_command               = ["<tab> inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg <enter><wait>"]
+http_content_file_name = "ks.cfg"
+boot_command           = ["<tab> inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg <enter><wait>"]
 #http_port_min = 8080
 #http_port_max = 8080
-boot_autoinstall_file_path = "packer-unattended_distrib_files/linux/oraclelinux/ks.pkrtpl"
+http_content_file_path = "packer-unattended_distrib_files/linux/oraclelinux/ks.pkrtpl"
 
 ### System variables
 template_name        = "template-linux-oraclelinux-9"

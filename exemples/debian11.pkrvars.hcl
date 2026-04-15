@@ -50,7 +50,7 @@ scsi_controller = "virtio-scsi-pci"
 ### Install variables
 #boot_key_interval = "5ms"
 #boot_wait = "10s"
-boot_autoinstall_file_name = "preseed.cfg"
+http_content_file_name = "preseed.cfg"
 boot_command = [
   "<esc><wait>",
   "auto <wait>",
@@ -66,7 +66,7 @@ boot_command = [
 ]
 #http_port_min = 8080
 #http_port_max = 8080
-boot_autoinstall_file_path = "../../modules/packer-unattended_distrib_files/linux/debian/preseed_standalone.pkrtpl"
+http_content_file_path = "../../modules/packer-unattended_distrib_files/linux/debian/preseed_standalone.pkrtpl"
 
 ### System variables
 template_name        = "template-linux-debian-12-test"
