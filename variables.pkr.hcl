@@ -55,7 +55,7 @@ variable "additional_iso_files" {
   type = list(object({
     iso_storage_pool = string
     device           = string
-    cd_files         = string
+    cd_files         = list(string)
     cd_label         = string
     unmount          = bool
   }))
