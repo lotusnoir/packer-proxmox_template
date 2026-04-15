@@ -51,15 +51,41 @@ variable "iso_unmount" {
 #################################################
 ### Additional Iso variables
 #################################################
-variable "additional_iso_files" {
-  type = object({
+#variable "additional_iso_files" {
+#  type = list(object({
+#    iso_storage_pool = string
+#    iso_file	= string
+#    device           = string
+#    cd_files         = list(string)
+#    cd_label         = string
+#    cd_content_file_name = string
+#    cd_content_file_path = string
+#    unmount          = bool
+#  }))
+#  default = null
+#}
+
+variable "additional_iso_mounts" {
+  type = list(object({
     iso_storage_pool = string
+    iso_file         = string
     device           = string
-    cd_files         = list(string)
-    cd_label         = string
     unmount          = bool
-  })
-  default = null
+  }))
+  default = []
+}
+
+variable "additional_cd_files" {
+  type = list(object({
+    iso_storage_pool     = string
+    device               = string
+    cd_files             = list(string)
+    cd_label             = string
+    cd_content_file_name = string
+    cd_content_file_path = string
+    unmount              = bool
+  }))
+  default = []
 }
 
 variable "additional_iso_cd_content_file_name" {

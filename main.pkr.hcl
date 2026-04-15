@@ -15,39 +15,96 @@ source "proxmox-iso" "this" {
   }
 
   dynamic "additional_iso_files" {
-    for_each = var.additional_iso_files != null ? [var.additional_iso_files] : []
+    for_each = var.additional_iso_mounts
+    content {
+      iso_storage_pool = additional_iso_files.value.iso_storage_pool
+      device           = additional_iso_files.value.device
+      iso_file         = additional_iso_files.value.iso_file
+      unmount          = additional_iso_files.value.unmount
+    }
+  }
+
+  dynamic "additional_iso_files" {
+    for_each = var.additional_cd_files
+
     content {
       iso_storage_pool = additional_iso_files.value.iso_storage_pool
       device           = additional_iso_files.value.device
       unmount          = additional_iso_files.value.unmount
       cd_files         = additional_iso_files.value.cd_files
       cd_label         = additional_iso_files.value.cd_label
-      cd_content = var.additional_iso_cd_content_file_name == "" ? {} : {
-        "/${var.additional_iso_cd_content_file_name}" = templatefile(var.additional_iso_cd_content_file_path, {
-          vm_name          = var.vm_name
-          internet_install = var.internet_install
-          filesystem_type  = var.filesystem_type
-          root_password    = local.root_password
-          ssh_username     = local.ssh_username
-          ssh_password     = var.additional_iso_cd_content_file_name == "user-data" ? bcrypt("${local.ssh_password}") : local.ssh_password
-          net_ip           = var.net_ip
-          net_gateway      = var.net_gateway
-          net_netmask      = var.net_netmask
-          net_dns          = var.net_dns
-          timezone         = var.timezone
-          locales          = var.locales
-          keyboard_layout  = var.keyboard_layout
-          disk_name        = var.disk_name
-          disk_swap_size   = var.disk_swap_size
-          disk_boot_size   = var.disk_boot_size
-          http_proxy       = var.http_proxy
-          major_version    = var.major_version
-          winrm_username   = local.winrm_username
-          winrm_password   = local.winrm_password
-        })
-      }
+
+      cd_content = (
+        additional_iso_files.value.cd_content_file_name != "" ?
+        {
+          "/${additional_iso_files.value.cd_content_file_name}" = templatefile(
+            additional_iso_files.value.cd_content_file_path,
+            {
+              vm_name          = var.vm_name
+              internet_install = var.internet_install
+              filesystem_type  = var.filesystem_type
+              root_password    = local.root_password
+              ssh_username     = local.ssh_username
+              ssh_password     = additional_iso_files.value.cd_content_file_name == "user-data" ? bcrypt(local.ssh_password) : local.ssh_password
+              net_ip           = var.net_ip
+              net_gateway      = var.net_gateway
+              net_netmask      = var.net_netmask
+              net_dns          = var.net_dns
+              timezone         = var.timezone
+              locales          = var.locales
+              keyboard_layout  = var.keyboard_layout
+              disk_name        = var.disk_name
+              disk_swap_size   = var.disk_swap_size
+              disk_boot_size   = var.disk_boot_size
+              http_proxy       = var.http_proxy
+              major_version    = var.major_version
+              winrm_username   = local.winrm_username
+              winrm_password   = local.winrm_password
+            }
+          )
+        }
+        : {}
+      )
     }
   }
+
+  #  dynamic "additional_iso_files" {
+  #    for_each = var.additional_iso_files != null ? [var.additional_iso_files] : []
+  #    content {
+  #      iso_storage_pool = additional_iso_files.value.iso_storage_pool
+  #      device           = additional_iso_files.value.device
+  #      iso_file         = (
+  #  try(additional_iso_files.value.iso_file, "") != ""
+  #) ? additional_iso_files.value.iso_file : null
+  #      unmount          = additional_iso_files.value.unmount
+  #      cd_files         = additional_iso_files.value.cd_files
+  #      cd_label         = additional_iso_files.value.cd_label
+  #      cd_content = additional_iso_files.value.cd_content_file_name == "" ? {} : {
+  #        "/${additional_iso_files.value.cd_content_file_name}" = templatefile(additional_iso_files.value.cd_content_file_path, {
+  #          vm_name          = var.vm_name
+  #          internet_install = var.internet_install
+  #          filesystem_type  = var.filesystem_type
+  #          root_password    = local.root_password
+  #          ssh_username     = local.ssh_username
+  #          ssh_password     = var.additional_iso_cd_content_file_name == "user-data" ? bcrypt("${local.ssh_password}") : local.ssh_password
+  #          net_ip           = var.net_ip
+  #          net_gateway      = var.net_gateway
+  #          net_netmask      = var.net_netmask
+  #          net_dns          = var.net_dns
+  #          timezone         = var.timezone
+  #          locales          = var.locales
+  #          keyboard_layout  = var.keyboard_layout
+  #          disk_name        = var.disk_name
+  #          disk_swap_size   = var.disk_swap_size
+  #          disk_boot_size   = var.disk_boot_size
+  #          http_proxy       = var.http_proxy
+  #          major_version    = var.major_version
+  #          winrm_username   = local.winrm_username
+  #          winrm_password   = local.winrm_password
+  #        })
+  #      }
+  #    }
+  #  }
 
   ### Boot config
   boot_key_interval = var.boot_key_interval
