@@ -190,7 +190,7 @@ source "proxmox-iso" "this" {
     bridge   = var.network_adapters_bridge
     model    = var.network_adapters_model
     firewall = var.network_adapters_firewall
-    #vlan_tag = ""
+    vlan_tag = var.network_adapters_vlan_tag
   }
 
   cloud_init              = var.cloud_init

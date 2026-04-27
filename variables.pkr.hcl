@@ -472,7 +472,10 @@ variable "network_adapters_firewall" {
   type    = bool
   default = false
 }
-
+variable "network_adapters_vlan_tag" {
+  type    = string
+  default = null
+}
 
 
 
