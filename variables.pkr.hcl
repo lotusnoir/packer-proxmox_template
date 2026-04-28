@@ -432,24 +432,35 @@ variable "disk_type" {
   default = "scsi"
 }
 
-variable "disk_efi_storage_pool" {
-  type    = string
-  default = "local-lvm"
+variable "efi_config" {
+  type = list(object({
+    efi_storage_pool  = string
+    efi_format        = string
+    pre_enrolled_keys = bool
+    efi_type          = string
+  }))
+  default = []
 }
 
-variable "disk_efi_pre_enrolled_keys" {
-  type    = bool
-  default = true
-}
 
-variable "disk_efi_format" {
-  type    = string
-  default = "raw"
-}
-variable "disk_efi_type" {
-  type    = string
-  default = "4m"
-}
+#variable "disk_efi_storage_pool" {
+#  type    = string
+#  default = "local-lvm"
+#}
+#
+#variable "disk_efi_pre_enrolled_keys" {
+#  type    = bool
+#  default = true
+#}
+#
+#variable "disk_efi_format" {
+#  type    = string
+#  default = "raw"
+#}
+#variable "disk_efi_type" {
+#  type    = string
+#  default = "4m"
+#}
 
 #variable "vm_efi_config" {
 #  type    = map(string)

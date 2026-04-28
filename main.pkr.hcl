@@ -173,6 +173,7 @@ source "proxmox-iso" "this" {
   template_name        = var.template_name
   template_description = var.template_description
   scsi_controller      = var.scsi_controller
+
   disks {
     disk_size    = var.disk_size
     format       = var.disk_format
@@ -180,12 +181,17 @@ source "proxmox-iso" "this" {
     storage_pool = var.disk_storage_pool
     type         = var.disk_type
   }
-  efi_config {
-    efi_storage_pool  = var.disk_efi_storage_pool
-    pre_enrolled_keys = var.disk_efi_pre_enrolled_keys
-    efi_format        = var.disk_efi_format
-    efi_type          = var.disk_efi_type
+
+  dynamic "efi_config" {
+    for_each = var.efi_config
+    content {
+      efi_storage_pool  = efi_config.value.efi_storage_pool
+      pre_enrolled_keys = efi_config.value.efi_pre_enrolled_keys
+      efi_format        = efi_config.value.efi_format
+      efi_type          = efi_config.value.efi_type
+    }
   }
+
   network_adapters {
     bridge   = var.network_adapters_bridge
     model    = var.network_adapters_model
