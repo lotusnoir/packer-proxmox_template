@@ -180,7 +180,27 @@ variable "http_port_max" {
   type    = number
   default = 9000
 }
-
+variable "http_directory" {
+  description = "Path to a directory to serve using an HTTP server."
+  type        = string
+  default     = null
+}
+variable "unattended_content" {
+  description = "Key/Values for the windows unattended cd with the Autounattend.xml file."
+  type = map(object({
+    template = string
+    vars     = map(string)
+  }))
+  default = {}
+}
+variable "http_content" {
+  description = "Key/Values for the windows unattended cd with the Autounattend.xml file."
+  type = map(object({
+    template = string
+    vars     = map(string)
+  }))
+  default = {}
+}
 
 
 #################################################
@@ -570,7 +590,6 @@ variable "net_gateway" {
   type    = string
   default = ""
 }
-
 variable "net_netmask" {
   type    = string
   default = "255.255.255.0"
@@ -615,37 +634,9 @@ variable "http_proxy" {
   type    = string
   default = ""
 }
-
 variable "major_version" {
   type    = string
-  default = "9"
-}
-
-variable "windows_edition" {
-  description = "Windows edition of the ISO file to install (this is usefull to overwrite for Windows 11 Pro or Server Core/Datacenter)."
-  type        = string
-  default     = ""
-}
-
-variable "windows_language" {
-  description = "Windows language to use. The ISO file must contain this lanugage."
-  type        = string
-  default     = "en-US"
-}
-
-variable "windows_input_language" {
-  description = "Windows language for the keyboard to use. The ISO file must contain this lanugage."
-  type        = string
-  default     = "en-US"
-}
-
-variable "unattended_content" {
-  description = "Key/Values for the windows unattended cd with the Autounattend.xml file."
-  type = map(object({
-    template = string
-    vars     = map(string)
-  }))
-  default = {}
+  default = ""
 }
 
 #################################################

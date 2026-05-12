@@ -67,8 +67,10 @@ source "proxmox-iso" "this" {
   http_interface    = var.http_interface
   http_bind_address = var.http_bind_address
   #http_network_protocol = var.http_network_protocol
-  http_port_min = var.http_port_min
-  http_port_max = var.http_port_max
+  http_port_min  = var.http_port_min
+  http_port_max  = var.http_port_max
+  http_directory = var.http_directory
+  http_content   = local.http_content
 
 
   ### VM config
@@ -122,40 +124,11 @@ source "proxmox-iso" "this" {
   }
 
 
-
-
-
-  #http_content = var.http_content_file_name == "" ? {} : {
-  #  "/${var.http_content_file_name}" = templatefile(var.http_content_file_path, {
-  #    vm_name          = var.vm_name
-  #    internet_install = var.internet_install
-  #    filesystem_type  = var.filesystem_type
-  #    root_password    = local.root_password
-  #    ssh_username     = local.ssh_username
-  #    ssh_password     = local.ssh_password
-  #    ssh_password     = var.http_content_file_name == "user-data" ? bcrypt("${local.ssh_password}") : local.ssh_password
-  #    net_ip           = var.net_ip
-  #    net_gateway      = var.net_gateway
-  #    net_netmask      = var.net_netmask
-  #    net_dns          = var.net_dns
-  #    timezone         = var.timezone
-  #    locales          = var.locales
-  #    keyboard_layout  = var.keyboard_layout
-  #    disk_swap_size   = var.disk_swap_size
-  #    disk_boot_size   = var.disk_boot_size
-  #    disk_name        = var.disk_name
-  #    http_proxy       = var.http_proxy
-  #    major_version    = var.major_version
-  #    winrm_username   = local.winrm_username
-  #    winrm_password   = local.winrm_password
-  #  })
-  #}
-
-
   ### Misc config
   task_timeout            = var.task_timeout
   cloud_init              = var.cloud_init
   cloud_init_storage_pool = var.cloud_init_storage_pool
+
 
   ### Communicator configuration
   communicator                 = var.communicator
@@ -189,6 +162,7 @@ source "proxmox-iso" "this" {
   winrm_insecure = var.winrm_insecure
   winrm_use_ntlm = var.winrm_use_ntlm
 }
+
 
 build {
   name    = "build"
