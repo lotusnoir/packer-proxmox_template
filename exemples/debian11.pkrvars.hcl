@@ -6,7 +6,7 @@
 # https://cdimage.debian.org/mirror/cdimage/archive/
 
 ### proxmox hypervisor variables
-proxmox_url      = "https://192.168.51.1:8006/api2/json"
+proxmox_host     = "192.168.51.1:8006"
 proxmox_skip_tls = true
 proxmox_node     = "geekom"
 proxmox_username = "packer@pve"
@@ -21,14 +21,14 @@ iso_unmount  = true
 ### Image variables
 #iso_url          = "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.2.0-amd64-netinst.iso"
 #iso_checksum     = "11d733d626d1c7d3b20cfcccc516caff2cbc57c81769d56434aab958d4d9b3af59106bc0796252aeefede8353e2582378e08c65e35a36769d5cf673c5444f80e"
-#iso_storage_pool = "local"
+iso_storage_pool = "local"
 #iso_target_path  = "isos_cache"
-iso_file = "local:iso/debian-12.2.0-amd64-netinst.iso"
+iso_file = "debian-12.2.0-amd64-netinst.iso"
 
 ### VM variables
-vm_name   = "debian-12"
-vm_memory = 2048
-vm_cores  = 1
+vm_name      = "debian-12"
+vm_memory    = 2048
+vm_cpu_cores = 1
 #vm_id                 = "100"
 #vm_ballooning_minimum = 0
 vm_cpu_type = "host"
@@ -43,14 +43,13 @@ disk_size         = "6G"
 disk_storage_pool = "local-lvm"
 #disk_format       = "raw"
 #disk_io_thread    = false
-disk_type       = "virtio"
-scsi_controller = "virtio-scsi-pci"
+disk_type          = "virtio"
+vm_scsi_controller = "virtio-scsi-pci"
 
 
 ### Install variables
 #boot_key_interval = "5ms"
 #boot_wait = "10s"
-http_content_file_name = "preseed.cfg"
 boot_command = [
   "<esc><wait>",
   "auto <wait>",
@@ -66,14 +65,13 @@ boot_command = [
 ]
 #http_port_min = 8080
 #http_port_max = 8080
-http_content_file_path = "../../modules/packer-unattended_distrib_files/linux/debian/preseed_standalone.pkrtpl"
+#http_content_file_name = "preseed.cfg"
+#http_content_file_path = "../../modules/packer-unattended_distrib_files/linux/debian/preseed_standalone.pkrtpl"
 
 ### System variables
-template_name        = "template-linux-debian-12-test"
-template_description = "debian-12.2.0"
-root_password        = "test"
-ssh_username         = "username"
-ssh_password         = "test"
+root_password = "test"
+ssh_username  = "username"
+ssh_password  = "test"
 #http_proxy            = ""
 timezone        = "Europe/Paris"
 locales         = "en_US.UTF-8"

@@ -2,184 +2,105 @@
 ## CLONE PARAMS
 ##########################################################
 source "proxmox-iso" "this" {
-  ### Iso config
-  boot_iso {
-    type             = var.iso_type
-    iso_url          = var.iso_url
-    iso_urls         = var.iso_urls
-    iso_checksum     = var.iso_checksum
-    iso_storage_pool = var.iso_storage_pool
-    iso_target_path  = var.iso_target_path
-    iso_file         = var.iso_file
-    unmount          = var.iso_unmount
-  }
-
-  dynamic "additional_iso_files" {
-    for_each = var.additional_iso_mounts
-    content {
-      iso_storage_pool = additional_iso_files.value.iso_storage_pool
-      device           = additional_iso_files.value.device
-      iso_file         = additional_iso_files.value.iso_file
-      unmount          = additional_iso_files.value.unmount
-    }
-  }
-
-  dynamic "additional_iso_files" {
-    for_each = var.additional_cd_files
-
-    content {
-      iso_storage_pool = additional_iso_files.value.iso_storage_pool
-      device           = additional_iso_files.value.device
-      unmount          = additional_iso_files.value.unmount
-      cd_files         = additional_iso_files.value.cd_files
-      cd_label         = additional_iso_files.value.cd_label
-
-      cd_content = (
-        additional_iso_files.value.cd_content_file_name != "" ?
-        {
-          "/${additional_iso_files.value.cd_content_file_name}" = templatefile(
-            additional_iso_files.value.cd_content_file_path,
-            {
-              vm_name          = var.vm_name
-              internet_install = var.internet_install
-              filesystem_type  = var.filesystem_type
-              root_password    = local.root_password
-              ssh_username     = local.ssh_username
-              ssh_password     = additional_iso_files.value.cd_content_file_name == "user-data" ? bcrypt(local.ssh_password) : local.ssh_password
-              net_ip           = var.net_ip
-              net_gateway      = var.net_gateway
-              net_netmask      = var.net_netmask
-              net_dns          = var.net_dns
-              timezone         = var.timezone
-              locales          = var.locales
-              keyboard_layout  = var.keyboard_layout
-              disk_name        = var.disk_name
-              disk_swap_size   = var.disk_swap_size
-              disk_boot_size   = var.disk_boot_size
-              http_proxy       = var.http_proxy
-              major_version    = var.major_version
-              winrm_username   = local.winrm_username
-              winrm_password   = local.winrm_password
-            }
-          )
-        }
-        : {}
-      )
-    }
-  }
-
-  #  dynamic "additional_iso_files" {
-  #    for_each = var.additional_iso_files != null ? [var.additional_iso_files] : []
-  #    content {
-  #      iso_storage_pool = additional_iso_files.value.iso_storage_pool
-  #      device           = additional_iso_files.value.device
-  #      iso_file         = (
-  #  try(additional_iso_files.value.iso_file, "") != ""
-  #) ? additional_iso_files.value.iso_file : null
-  #      unmount          = additional_iso_files.value.unmount
-  #      cd_files         = additional_iso_files.value.cd_files
-  #      cd_label         = additional_iso_files.value.cd_label
-  #      cd_content = additional_iso_files.value.cd_content_file_name == "" ? {} : {
-  #        "/${additional_iso_files.value.cd_content_file_name}" = templatefile(additional_iso_files.value.cd_content_file_path, {
-  #          vm_name          = var.vm_name
-  #          internet_install = var.internet_install
-  #          filesystem_type  = var.filesystem_type
-  #          root_password    = local.root_password
-  #          ssh_username     = local.ssh_username
-  #          ssh_password     = var.additional_iso_cd_content_file_name == "user-data" ? bcrypt("${local.ssh_password}") : local.ssh_password
-  #          net_ip           = var.net_ip
-  #          net_gateway      = var.net_gateway
-  #          net_netmask      = var.net_netmask
-  #          net_dns          = var.net_dns
-  #          timezone         = var.timezone
-  #          locales          = var.locales
-  #          keyboard_layout  = var.keyboard_layout
-  #          disk_name        = var.disk_name
-  #          disk_swap_size   = var.disk_swap_size
-  #          disk_boot_size   = var.disk_boot_size
-  #          http_proxy       = var.http_proxy
-  #          major_version    = var.major_version
-  #          winrm_username   = local.winrm_username
-  #          winrm_password   = local.winrm_password
-  #        })
-  #      }
-  #    }
-  #  }
-
-  ### Boot config
-  boot_key_interval = var.boot_key_interval
-  boot              = var.boot_order
-  boot_wait         = var.boot_wait
-  boot_command      = var.boot_command
-
-  http_interface = var.http_interface
-  #http_bind_address = var.http_bind_address
-  #http_network_protocol = var.http_network_protocol
-  http_port_min = var.http_port_min
-  http_port_max = var.http_port_max
-  http_content = var.http_content_file_name == "" ? {} : {
-    "/${var.http_content_file_name}" = templatefile(var.http_content_file_path, {
-      vm_name          = var.vm_name
-      internet_install = var.internet_install
-      filesystem_type  = var.filesystem_type
-      root_password    = local.root_password
-      ssh_username     = local.ssh_username
-      ssh_password     = local.ssh_password
-      ssh_password     = var.http_content_file_name == "user-data" ? bcrypt("${local.ssh_password}") : local.ssh_password
-      net_ip           = var.net_ip
-      net_gateway      = var.net_gateway
-      net_netmask      = var.net_netmask
-      net_dns          = var.net_dns
-      timezone         = var.timezone
-      locales          = var.locales
-      keyboard_layout  = var.keyboard_layout
-      disk_swap_size   = var.disk_swap_size
-      disk_boot_size   = var.disk_boot_size
-      disk_name        = var.disk_name
-      http_proxy       = var.http_proxy
-      major_version    = var.major_version
-      winrm_username   = local.winrm_username
-      winrm_password   = local.winrm_password
-    })
-  }
-
   ### hypervisor config
-  proxmox_url              = var.proxmox_url
-  insecure_skip_tls_verify = var.proxmox_skip_tls
-  node                     = var.proxmox_node
-  pool                     = var.proxmox_pool
+  proxmox_url              = "https://${var.proxmox_host}/api2/json"
   username                 = var.proxmox_username
   password                 = var.proxmox_password
   token                    = var.proxmox_token
+  insecure_skip_tls_verify = var.proxmox_skip_tls
+  node                     = var.proxmox_node
+  pool                     = var.proxmox_pool
 
 
+  ### Boot Iso config
+  boot_iso {
+    # type             = var.iso_type
+    #index            = var.iso_index
+    iso_file         = var.iso_download ? "" : "${var.iso_storage_pool}:iso/${var.iso_file}"
+    iso_storage_pool = var.iso_storage_pool
+    #iso_target_path  = var.iso_target_path
+    iso_download_pve = var.iso_download_pve
+    iso_url          = var.iso_download ? var.iso_url : ""
+    #iso_urls         = (var.iso_download && var.iso_url == null) ? var.iso_urls : []
+    iso_checksum = var.iso_checksum
+    unmount      = var.iso_unmount
+  }
 
-  ### Misc config
-  task_timeout = var.task_timeout
-  qemu_agent   = var.qemu_agent
+  ### Additional Iso config
+  dynamic "additional_iso_files" {
+    for_each = var.additional_iso_files
+    content {
+      #type             = additional_iso_files.value.type
+      #index            = additional_iso_files.value.index
+      iso_file         = var.iso_download ? "" : "${var.iso_storage_pool}:iso/${additional_iso_files.value.iso_file}"
+      iso_storage_pool = var.iso_storage_pool
+      iso_url          = var.iso_download ? additional_iso_files.value.iso_url : ""
+      iso_checksum     = additional_iso_files.value.iso_checksum
+      iso_download_pve = var.iso_download_pve
+      unmount          = var.iso_unmount
+    }
+  }
+
+  dynamic "additional_iso_files" {
+    for_each = local.additional_cd_files
+    iterator = iso
+    content {
+      type             = iso.value.type
+      index            = iso.value.index
+      iso_storage_pool = var.iso_storage_pool
+      cd_files         = contains(keys(iso.value), "files") ? iso.value.files : []
+      cd_content       = contains(keys(iso.value), "content") ? iso.value.content : {}
+      cd_label         = contains(keys(iso.value), "label") ? iso.value.label : ""
+      unmount          = var.iso_unmount
+    }
+  }
+
+
+  ### Boot config
+  boot              = var.boot_order
+  boot_wait         = var.boot_wait
+  boot_key_interval = var.boot_key_interval
+  boot_command      = var.boot_command
+
+
+  ### Http packer config
+  http_interface    = var.http_interface
+  http_bind_address = var.http_bind_address
+  #http_network_protocol = var.http_network_protocol
+  http_port_min = var.http_port_min
+  http_port_max = var.http_port_max
+
 
   ### VM config
-  vm_name              = var.vm_name
   vm_id                = var.vm_id
+  vm_name              = var.vm_name
   memory               = var.vm_memory
   ballooning_minimum   = var.vm_ballooning_minimum
-  cores                = var.vm_cores
   cpu_type             = var.vm_cpu_type
-  sockets              = var.vm_sockets
+  cores                = var.vm_cpu_cores
+  sockets              = var.vm_cpu_sockets
   numa                 = var.vm_numa
   os                   = var.vm_os
   bios                 = var.vm_bios
   machine              = var.vm_machine_type
-  template_name        = var.template_name
-  template_description = var.template_description
-  scsi_controller      = var.scsi_controller
+  qemu_agent           = var.qemu_agent
+  onboot               = var.start_at_boot
+  scsi_controller      = var.vm_scsi_controller
+  template_name        = var.vm_name
+  template_description = var.description == "" ? "${var.vm_name}, generated by packer at ${formatdate("YYYY-MM-DD hh:mm:ss", timestamp())}" : var.description
+
+  vga {
+    type   = var.vga_type
+    memory = var.vga_memory
+  }
 
   disks {
+    storage_pool = var.disk_storage_pool
     disk_size    = var.disk_size
     format       = var.disk_format
     io_thread    = var.disk_io_thread
-    storage_pool = var.disk_storage_pool
     type         = var.disk_type
+    cache_mode   = var.disk_cache
   }
 
   dynamic "efi_config" {
@@ -193,12 +114,46 @@ source "proxmox-iso" "this" {
   }
 
   network_adapters {
-    bridge   = var.network_adapters_bridge
-    model    = var.network_adapters_model
-    firewall = var.network_adapters_firewall
-    vlan_tag = var.network_adapters_vlan_tag
+    bridge      = var.network_adapters_bridge
+    model       = var.network_adapters_model
+    mac_address = var.network_adapter_mac
+    firewall    = var.network_adapters_firewall
+    vlan_tag    = var.network_adapters_vlan_tag
   }
 
+
+
+
+
+  #http_content = var.http_content_file_name == "" ? {} : {
+  #  "/${var.http_content_file_name}" = templatefile(var.http_content_file_path, {
+  #    vm_name          = var.vm_name
+  #    internet_install = var.internet_install
+  #    filesystem_type  = var.filesystem_type
+  #    root_password    = local.root_password
+  #    ssh_username     = local.ssh_username
+  #    ssh_password     = local.ssh_password
+  #    ssh_password     = var.http_content_file_name == "user-data" ? bcrypt("${local.ssh_password}") : local.ssh_password
+  #    net_ip           = var.net_ip
+  #    net_gateway      = var.net_gateway
+  #    net_netmask      = var.net_netmask
+  #    net_dns          = var.net_dns
+  #    timezone         = var.timezone
+  #    locales          = var.locales
+  #    keyboard_layout  = var.keyboard_layout
+  #    disk_swap_size   = var.disk_swap_size
+  #    disk_boot_size   = var.disk_boot_size
+  #    disk_name        = var.disk_name
+  #    http_proxy       = var.http_proxy
+  #    major_version    = var.major_version
+  #    winrm_username   = local.winrm_username
+  #    winrm_password   = local.winrm_password
+  #  })
+  #}
+
+
+  ### Misc config
+  task_timeout            = var.task_timeout
   cloud_init              = var.cloud_init
   cloud_init_storage_pool = var.cloud_init_storage_pool
 
@@ -236,6 +191,7 @@ source "proxmox-iso" "this" {
 }
 
 build {
+  name    = "build"
   sources = ["source.proxmox-iso.this"]
 
   provisioner "ansible" {

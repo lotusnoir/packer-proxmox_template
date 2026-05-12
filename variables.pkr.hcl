@@ -1,46 +1,93 @@
 #################################################
-### Iso variables
+### hypervisor variables
+#################################################
+variable "proxmox_host" {
+  description = "URL to the Proxmox API, fqdn or ip:port."
+  type        = string
+}
+variable "proxmox_username" {
+  description = "Username when authenticating to Proxmox, including the realm"
+  type        = string
+}
+variable "proxmox_password" {
+  description = "Password for the user."
+  type        = string
+  sensitive   = true
+  default     = null
+}
+variable "proxmox_token" {
+  description = "Token for authenticating API calls. This allows the API client to work with API tokens instead of user passwords. "
+  type        = string
+  default     = null
+}
+variable "proxmox_skip_tls" {
+  description = "Skip validating the certificate."
+  type        = bool
+  default     = false
+}
+variable "proxmox_node" {
+  description = "Which node in the Proxmox cluster to start the virtual machine on during creation."
+  type        = string
+}
+variable "proxmox_pool" {
+  description = "Name of resource pool to create virtual machine in."
+  type        = string
+  default     = null
+}
+
+
+
+#################################################
+### Boot Iso variables
 #################################################
 variable "iso_type" {
   type    = string
   default = "scsi"
 }
-
-variable "iso_url" {
-  description = "A URL to the ISO containing the installation image or virtual hard drive (VHD or VHDX) file to clone"
+variable "iso_index" {
+  type    = number
+  default = null
+}
+variable "iso_download" {
+  description = "Wether to download from iso_url or use the existing iso_file in the iso_storage_pool."
+  type        = bool
+  default     = false
+}
+variable "iso_file" {
+  description = "Name of the iso file"
   type        = string
-  default     = ""
+  default     = null
 }
-
-variable "iso_urls" {
-  description = "Multiple URLs for the ISO to download. Packer will try these in order. If anything goes wrong attempting to download or while downloading a single URL, it will move on to the next. All URLs must point to the same file (same checksum). By default this is empty and iso_url is used. Only one of iso_url or iso_urls can be specified."
-  type        = list(string)
-  default     = []
-}
-
-variable "iso_checksum" {
-  description = "The checksum for the ISO file or virtual hard drive file. The type of the checksum is specified within the checksum field as a prefix. The type of the checksum can also be omitted and Packer will try to infer it based on string length."
-  type        = string
-  default     = ""
-}
-
 variable "iso_storage_pool" {
   description = "Proxmox storage pool onto which to upload the ISO file."
   type        = string
   default     = null
 }
-
 variable "iso_target_path" {
   description = "The path where the iso should be saved after download. By default will go in the packer cache, with a hash of the original filename and checksum as its name."
   type        = string
   default     = null
 }
-
-variable "iso_file" {
-  type    = string
-  default = null
+variable "iso_download_pve" {
+  description = "Download the specified `iso_url` directly from the PVE node."
+  type        = bool
+  default     = false
 }
-
+variable "iso_url" {
+  description = "A URL to the ISO containing the installation image or virtual hard drive (VHD or VHDX) file to clone"
+  type        = string
+  default     = null
+}
+variable "iso_urls" {
+  description = "Multiple URLs for the ISO to download. Packer will try these in order. If anything goes wrong attempting to download or while downloading a single URL, it will move on to the next. All URLs must point to the same file (same checksum). By default this is empty and iso_url is used. Only one of iso_url or iso_urls can be specified."
+  type        = list(string)
+  default     = []
+}
+variable "iso_checksum" {
+  description = "The checksum for the ISO file or virtual hard drive file. The type of the checksum is specified within the checksum field as a prefix. The type of the checksum can also be omitted and Packer will try to infer it based on string length."
+  type        = string
+  default     = null
+}
 variable "iso_unmount" {
   description = "Remove the mounted ISO from the template after finishing."
   type        = bool
@@ -48,136 +95,299 @@ variable "iso_unmount" {
 }
 
 
+
 #################################################
 ### Additional Iso variables
 #################################################
-#variable "additional_iso_files" {
-#  type = list(object({
-#    iso_storage_pool = string
-#    iso_file	= string
-#    device           = string
-#    cd_files         = list(string)
-#    cd_label         = string
-#    cd_content_file_name = string
-#    cd_content_file_path = string
-#    unmount          = bool
-#  }))
-#  default = null
-#}
-
-variable "additional_iso_mounts" {
+variable "additional_iso_files" {
+  description = "Additional ISO files attached to the virtual machine."
   type = list(object({
-    iso_storage_pool = string
-    iso_file         = string
-    device           = string
-    unmount          = bool
+    #type  = string
+    #index = number
+    #type             = string
+    iso_file = string
+    #iso_storage_pool = string
+    iso_url      = string
+    iso_checksum = string
+    #unmount          = bool
   }))
   default = []
 }
 
 variable "additional_cd_files" {
+  description = "Additional files attached to the virtual machine as iso."
   type = list(object({
-    iso_storage_pool     = string
-    device               = string
-    cd_files             = list(string)
-    cd_label             = string
-    cd_content_file_name = string
-    cd_content_file_path = string
-    unmount              = bool
+    type  = string
+    index = number
+    #iso_storage_pool     = string
+    files = list(string)
+    #cd_label             = string
+    #cd_content_file_name = string
+    #cd_content_file_path = string
+    #unmount              = bool
   }))
   default = []
 }
 
-variable "additional_iso_cd_content_file_name" {
-  type    = string
-  default = ""
-}
 
-variable "additional_iso_cd_content_file_path" {
-  type    = string
-  default = ""
-}
 
 #################################################
 ### boot variables
 #################################################
-variable "boot_key_interval" {
-  description = "Boot Key Interval."
-  type        = string
-  default     = "5ms"
-}
-
 variable "boot_order" {
   description = "Override default boot order. Format example order=virtio0;ide2;net0. Prior to Proxmox 6.2-15 the format was cdn (c:CDROM -> d:Disk -> n:Network)"
   type        = string
   default     = "order=virtio0;scsi0;net0"
 }
-
 variable "boot_wait" {
-  type    = string
-  default = "10s"
+  description = "The time to wait before typing boot_command."
+  type        = string
+  default     = "10s"
 }
-
+variable "boot_key_interval" {
+  description = "Boot Key Interval."
+  type        = string
+  default     = "5ms"
+}
 variable "boot_command" {
-  type        = list(string)
   description = "boot command instructions"
+  type        = list(string)
 }
 
 
 #################################################
-### Http variables
+### Http packer variables
 #################################################
 variable "http_interface" {
-  type    = string
-  default = null
+  description = "Name of the network interface that Packer gets HTTPIP from. Defaults to the first non loopback interface."
+  type        = string
+  default     = null
 }
-
 variable "http_bind_address" {
-  type    = string
-  default = null
+  description = "This is the bind address for the HTTP server. Defaults to 0.0.0.0 so that it will work with any network interface."
+  type        = string
+  default     = null
 }
-
 variable "http_network_protocol" {
   type    = string
   default = null
 }
-
 variable "http_port_min" {
   type    = number
   default = 8000
 }
-
 variable "http_port_max" {
   type    = number
   default = 9000
 }
 
-variable "http_content_file_name" {
+
+
+#################################################
+### VM variables
+#################################################
+variable "vm_id" {
+  description = "The ID used to reference the virtual machine. This will also be the ID of the final template. Proxmox VMIDs are unique cluster-wide and are limited to the range 100-999999999. If not given, the next free ID on the cluster will be used."
+  type        = number
+  default     = 0
+}
+variable "vm_name" {
+  description = "Name of the virtual machine during creation. If not given, a random uuid will be used."
+  type        = string
+}
+variable "vm_memory" {
+  description = "How much memory (in megabytes) to give the virtual machine. If ballooning_minimum is also set, memory defines the maximum amount of memory the VM will be able to use."
+  type        = number
+  default     = 2048
+}
+variable "vm_ballooning_minimum" {
+  description = "Setting this option enables KVM memory ballooning and defines the minimum amount of memory (in megabytes) the VM will have."
+  type        = number
+  default     = 0
+}
+variable "vm_cpu_type" {
+  description = "How many CPU sockets to give the virtual machine."
+  type        = string
+  default     = "host"
+}
+variable "vm_cpu_cores" {
+  description = "How many CPU cores to give the virtual machine."
+  type        = number
+  default     = 2
+}
+variable "vm_cpu_sockets" {
+  description = "How many CPU sockets to give the virtual machine."
+  type        = number
+  default     = 1
+}
+variable "vm_numa" {
+  description = "support for non-uniform memory access (NUMA) is enabled."
+  type        = bool
+  default     = false
+}
+variable "vm_os" {
+  description = "The operating system. Can be wxp, w2k, w2k3, w2k8, wvista, win7, win8, win10, l24 (Linux 2.4), l26 (Linux 2.6+), solaris or other."
+  type        = string
+  default     = "l26"
+}
+variable "vm_bios" {
+  description = "Set the machine bios."
+  type        = string
+  default     = "seabios"
+}
+variable "vm_machine_type" {
   type    = string
   default = ""
 }
-
-variable "http_content_file_path" {
-  type    = string
-  default = null
+variable "start_at_boot" {
+  description = "Whether to have the VM startup after the PVE node starts."
+  type        = bool
+  default     = true
+}
+variable "qemu_agent" {
+  description = "Whether to enable the QEMU Guest Agent. qemu-guest-agent daemon must run the in the quest."
+  type        = bool
+  default     = true
+}
+variable "vm_scsi_controller" {
+  description = "The SCSI controller model to emulate."
+  type        = string
+  default     = "virtio-scsi-pci"
+}
+variable "description" {
+  description = "The description of the VM. Shows as the 'Notes' field in the Proxmox GUI."
+  type        = string
+  default     = ""
 }
 
 
+
 #################################################
-### Custom templates http or cd variables
+### VGA variables
 #################################################
-variable "internet_install" {
+variable "vga_type" {
+  description = "The type of display to virtualize."
+  type        = string
+  default     = "std"
+}
+
+variable "vga_memory" {
+  description = "Sets the VGA memory (in MiB)."
+  type        = number
+  default     = 32
+}
+
+
+
+#################################################
+### DISK
+#################################################
+variable "disk_storage_pool" {
+  type = string
+}
+variable "disk_size" {
+  type = string
+}
+variable "disk_format" {
+  type    = string
+  default = "raw"
+}
+variable "disk_io_thread" {
   type    = bool
-  default = true
+  default = false
 }
-variable "filesystem_type" {
+variable "disk_type" {
   type    = string
-  default = "ext4"
+  default = "scsi"
+}
+variable "disk_cache" {
+  type    = string
+  default = "none"
+}
+variable "efi_config" {
+  type = list(object({
+    efi_storage_pool  = string
+    efi_format        = string
+    pre_enrolled_keys = bool
+    efi_type          = string
+  }))
+  default = []
 }
 
-variable "root_password" {
-  type      = string
-  sensitive = true
+#################################################
+### Network Adapter
+#################################################
+variable "network_adapters_bridge" {
+  description = "Bridge to which the network device should be attached."
+  type        = string
+  default     = "vmbr0"
+}
+variable "network_adapters_model" {
+  description = "Network Card Model."
+  type        = string
+  default     = "virtio"
+}
+variable "network_adapters_firewall" {
+  description = "Whether to enable the Proxmox firewall on this network device."
+  type        = bool
+  default     = false
+}
+variable "network_adapters_vlan_tag" {
+  description = "The VLAN tag to apply to packets on this device."
+  type        = number
+  default     = null
+}
+variable "network_adapter_mac" {
+  description = "Override the randomly generated MAC Address for the VM."
+  type        = string
+  default     = null
+}
+
+
+
+#################################################
+### Misc variables
+#################################################
+variable "task_timeout" {
+  description = "The timeout for Promox API operations, e.g. clones."
+  type        = string
+  default     = "5m"
+}
+variable "cloud_init" {
+  description = "Wether to add a Cloud-Init CDROM drive after the virtual machine has been converted to a template."
+  type        = bool
+  default     = false
+}
+
+variable "cloud_init_storage_pool" {
+  description = "Name of the Proxmox storage pool to store the Cloud-Init CDROM on."
+  type        = string
+  default     = null
+}
+
+
+#################################################
+### Communicator variables
+#################################################
+variable "communicator" {
+  description = "The packer communicator to use"
+  type        = string
+  default     = "ssh"
+}
+variable "pause_before_connecting" {
+  description = "We recommend that you enable SSH or WinRM as the very last step in your guest's bootstrap script, but sometimes you may have a race condition where you need Packer to wait before attempting to connect to your guest."
+  type        = string
+  default     = null
+}
+variable "ssh_host" {
+  description = "The address to SSH to. This usually is automatically configured by the builder."
+  type        = string
+  default     = ""
+}
+variable "ssh_port" {
+  description = "The port to connect to SSH."
+  type        = string
+  default     = "22"
 }
 variable "ssh_username" {
   description = "The username to connect to SSH with. Required if using SSH."
@@ -189,6 +399,168 @@ variable "ssh_password" {
   type        = string
   sensitive   = true
   default     = ""
+}
+variable "ssh_ciphers" {
+  description = "This overrides the value of ciphers supported by default by Golang."
+  type        = list(string)
+  default     = ["aes128-gcm@openssh.com", "chacha20-poly1305@openssh.com", "aes128-ctr", "aes192-ctr", "aes256-ctr", ]
+}
+variable "ssh_clear_authorized_keys" {
+  description = ""
+  type        = bool
+  default     = false
+}
+variable "ssh_key_exchange_algorithms" {
+  description = "If set, Packer will override the value of key exchange (kex) algorithms supported by default by Golang."
+  type        = list(string)
+  default     = []
+}
+variable "ssh_certificate_file" {
+  description = "Path to user certificate used to authenticate with bastion host. The ~ can be used in path and will be expanded to the home directory of current user"
+  type        = string
+  default     = ""
+}
+variable "ssh_pty" {
+  description = "If true, a PTY will be requested for the SSH connection."
+  type        = bool
+  default     = false
+}
+variable "ssh_timeout" {
+  description = "The time to wait for SSH to become available. Packer uses this to determine when the machine has booted so this is usually quite long. "
+  type        = string
+  default     = "15m"
+}
+variable "ssh_disable_agent_forwarding" {
+  description = " If true, SSH agent forwarding will be disabled"
+  type        = bool
+  default     = false
+}
+variable "ssh_handshake_attempts" {
+  description = "The number of handshakes to attempt with SSH once it can connect. "
+  type        = number
+  default     = 10
+}
+variable "ssh_bastion_host" {
+  description = " A bastion host to use for the actual SSH connection."
+  type        = string
+  default     = ""
+}
+variable "ssh_bastion_port" {
+  description = "The port of the bastion host."
+  type        = number
+  default     = "22"
+}
+variable "ssh_bastion_agent_auth" {
+  description = ""
+  type        = bool
+  default     = false
+}
+variable "ssh_bastion_username" {
+  description = ""
+  type        = string
+  default     = ""
+}
+variable "ssh_bastion_password" {
+  description = ""
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+variable "ssh_bastion_interactive" {
+  description = ""
+  type        = bool
+  default     = false
+}
+
+
+#################################################
+### Winrm variables
+#################################################
+variable "winrm_username" {
+  type        = string
+  description = "The username to use to connect to WinRM."
+  default     = "Administrateur"
+}
+
+variable "winrm_password" {
+  type        = string
+  description = "The password to use to connect to WinRM."
+  default     = null
+}
+variable "winrm_host" {
+  type        = string
+  description = "The address for WinRM to connect to."
+  default     = null
+}
+
+variable "winrm_no_proxy" {
+  type        = bool
+  description = "Setting this to true adds the remote host:port to the NO_PROXY environment variable. This has the effect of bypassing any configured proxies when connecting to the remote host."
+  default     = false
+}
+
+variable "winrm_port" {
+  type        = string
+  description = "The WinRM port to connect to. This defaults to 5985 for plain unencrypted connection and 5986 for SSL when winrm_use_ssl is set to true."
+  default     = "5985"
+}
+
+variable "winrm_timeout" {
+  type        = string
+  description = "The amount of time to wait for WinRM to become available. This defaults to 30m since setting up a Windows machine generally takes a long time."
+  default     = "15m"
+}
+
+variable "winrm_use_ssl" {
+  type        = bool
+  description = "If true, use HTTPS for WinRM."
+  default     = false
+}
+
+variable "winrm_insecure" {
+  type        = bool
+  description = "If true, do not check server certificate chain and host name."
+  default     = false
+}
+
+variable "winrm_use_ntlm" {
+  type        = bool
+  description = "If true, NTLMv2 authentication (with session security) will be used for WinRM, rather than default (basic authentication), removing the requirement for basic authentication to be enabled within the target guest. Further reading for remote connection authentication can be found here."
+  default     = false
+}
+
+
+
+
+
+
+
+#################################################
+### Custom templates http or cd variables
+#################################################
+#variable "provisioner" {
+#  description = "The packer provisioner commands."
+#  type        = list(string)
+#}
+#variable "http_content_file_name" {
+#  type    = string
+#  default = ""
+#}
+#variable "http_content_file_path" {
+#  type    = string
+#  default = null
+#}
+variable "internet_install" {
+  type    = bool
+  default = true
+}
+variable "filesystem_type" {
+  type    = string
+  default = "ext4"
+}
+variable "root_password" {
+  type      = string
+  sensitive = true
 }
 variable "net_ip" {
   type    = string
@@ -249,405 +621,32 @@ variable "major_version" {
   default = "9"
 }
 
-variable "winrm_username" {
+variable "windows_edition" {
+  description = "Windows edition of the ISO file to install (this is usefull to overwrite for Windows 11 Pro or Server Core/Datacenter)."
   type        = string
-  description = "The username to use to connect to WinRM."
-  default     = "Administrateur"
+  default     = ""
 }
 
-variable "winrm_password" {
+variable "windows_language" {
+  description = "Windows language to use. The ISO file must contain this lanugage."
   type        = string
-  description = "The password to use to connect to WinRM."
-  default     = null
+  default     = "en-US"
 }
 
-
-
-#################################################
-### hypervisor variables
-#################################################
-variable "proxmox_url" {
-  description = "URL to the Proxmox API, fqdn or ip:port."
+variable "windows_input_language" {
+  description = "Windows language for the keyboard to use. The ISO file must contain this lanugage."
   type        = string
+  default     = "en-US"
 }
 
-variable "proxmox_skip_tls" {
-  description = "Skip validating the certificate."
-  type        = bool
-  default     = false
-}
-
-variable "proxmox_node" {
-  description = "Which node in the Proxmox cluster to start the virtual machine on during creation."
-  type        = string
-}
-
-variable "proxmox_pool" {
-  description = "Name of resource pool to create virtual machine in."
-  type        = string
-  default     = null
-}
-
-variable "proxmox_username" {
-  description = "Username when authenticating to Proxmox, including the realm"
-  type        = string
-}
-
-variable "proxmox_password" {
-  description = "Password for the user."
-  type        = string
-  sensitive   = true
-  default     = null
-}
-
-variable "proxmox_token" {
-  description = "Token for authenticating API calls. This allows the API client to work with API tokens instead of user passwords. "
-  type        = string
-  default     = null
-}
-
-
-
-
-#################################################
-### Misc variables
-#################################################
-
-variable "task_timeout" {
-  description = "The timeout for Promox API operations, e.g. clones."
-  type        = string
-  default     = "1m"
-}
-
-variable "qemu_agent" {
-  type    = bool
-  default = true
-}
-
-
-
-#################################################
-### VM variables
-#################################################
-variable "vm_name" {
-  description = "Name of the virtual machine during creation. If not given, a random uuid will be used."
-  type        = string
-}
-
-variable "vm_id" {
-  description = "The ID used to reference the virtual machine. This will also be the ID of the final template. Proxmox VMIDs are unique cluster-wide and are limited to the range 100-999999999. If not given, the next free ID on the cluster will be used."
-  type        = number
-  default     = 0
-}
-
-variable "vm_memory" {
-  description = "How much memory (in megabytes) to give the virtual machine. If ballooning_minimum is also set, memory defines the maximum amount of memory the VM will be able to use."
-  type        = number
-  default     = 512
-}
-
-variable "vm_ballooning_minimum" {
-  description = "Setting this option enables KVM memory ballooning and defines the minimum amount of memory (in megabytes) the VM will have."
-  type        = number
-  default     = 0
-}
-
-variable "vm_cores" {
-  description = "How many CPU cores to give the virtual machine."
-  type        = number
-  default     = 1
-}
-
-variable "vm_cpu_type" {
-  description = "How many CPU sockets to give the virtual machine."
-  type        = string
-  default     = "host"
-}
-
-variable "vm_sockets" {
-  description = "How many CPU sockets to give the virtual machine."
-  type        = number
-  default     = 1
-}
-
-variable "vm_numa" {
-  description = "support for non-uniform memory access (NUMA) is enabled."
-  type        = bool
-  default     = false
-}
-
-variable "vm_os" {
-  description = "The operating system. Can be wxp, w2k, w2k3, w2k8, wvista, win7, win8, win10, l24 (Linux 2.4), l26 (Linux 2.6+), solaris or other."
-  type        = string
-  default     = "l26"
-}
-
-variable "vm_bios" {
-  type    = string
-  default = "seabios"
-}
-
-variable "vm_machine_type" {
-  type    = string
-  default = ""
-}
-
-variable "template_name" {
-  type = string
-}
-
-variable "template_description" {
-  type = string
-}
-
-
-#################################################
-### DISK
-#################################################
-variable "scsi_controller" {
-  type    = string
-  default = "virtio-scsi-pci"
-}
-
-variable "disk_size" {
-  type = string
-}
-
-variable "disk_format" {
-  type    = string
-  default = "raw"
-}
-
-variable "disk_io_thread" {
-  type    = bool
-  default = false
-}
-
-variable "disk_storage_pool" {
-  type = string
-}
-
-variable "disk_type" {
-  type    = string
-  default = "scsi"
-}
-
-variable "efi_config" {
-  type = list(object({
-    efi_storage_pool  = string
-    efi_format        = string
-    pre_enrolled_keys = bool
-    efi_type          = string
+variable "unattended_content" {
+  description = "Key/Values for the windows unattended cd with the Autounattend.xml file."
+  type = map(object({
+    template = string
+    vars     = map(string)
   }))
-  default = []
+  default = {}
 }
-
-
-#variable "disk_efi_storage_pool" {
-#  type    = string
-#  default = "local-lvm"
-#}
-#
-#variable "disk_efi_pre_enrolled_keys" {
-#  type    = bool
-#  default = true
-#}
-#
-#variable "disk_efi_format" {
-#  type    = string
-#  default = "raw"
-#}
-#variable "disk_efi_type" {
-#  type    = string
-#  default = "4m"
-#}
-
-#variable "vm_efi_config" {
-#  type    = map(string)
-#  default = null
-#}
-
-
-#################################################
-### Network Adapter
-#################################################
-variable "network_adapters_bridge" {
-  type    = string
-  default = "vmbr0"
-}
-variable "network_adapters_model" {
-  type    = string
-  default = "virtio"
-}
-variable "network_adapters_firewall" {
-  type    = bool
-  default = false
-}
-variable "network_adapters_vlan_tag" {
-  type    = string
-  default = null
-}
-
-
-
-
-#################################################
-### Cloud init
-#################################################
-variable "cloud_init" {
-  type    = bool
-  default = false
-}
-
-variable "cloud_init_storage_pool" {
-  type    = string
-  default = null
-}
-
-
-#################################################
-### Communicator configuration
-#################################################
-variable "communicator" {
-  type    = string
-  default = "ssh"
-}
-
-variable "pause_before_connecting" {
-  description = "We recommend that you enable SSH or WinRM as the very last step in your guest's bootstrap script, but sometimes you may have a race condition where you need Packer to wait before attempting to connect to your guest."
-  type        = string
-  default     = null
-}
-
-variable "ssh_host" {
-  description = "The address to SSH to. This usually is automatically configured by the builder."
-  type        = string
-  default     = ""
-}
-
-variable "ssh_port" {
-  description = "The port to connect to SSH."
-  type        = string
-  default     = "22"
-}
-variable "ssh_ciphers" {
-  description = "This overrides the value of ciphers supported by default by Golang."
-  type        = list(string)
-  default     = ["aes128-gcm@openssh.com", "chacha20-poly1305@openssh.com", "aes128-ctr", "aes192-ctr", "aes256-ctr", ]
-}
-variable "ssh_clear_authorized_keys" {
-  description = ""
-  type        = bool
-  default     = false
-}
-variable "ssh_key_exchange_algorithms" {
-  description = "If set, Packer will override the value of key exchange (kex) algorithms supported by default by Golang."
-  type        = list(string)
-  default     = []
-}
-variable "ssh_certificate_file" {
-  description = "Path to user certificate used to authenticate with bastion host. The ~ can be used in path and will be expanded to the home directory of current user"
-  type        = string
-  default     = ""
-}
-variable "ssh_pty" {
-  description = "If true, a PTY will be requested for the SSH connection."
-  type        = bool
-  default     = false
-}
-variable "ssh_timeout" {
-  description = "The time to wait for SSH to become available. Packer uses this to determine when the machine has booted so this is usually quite long. "
-  type        = string
-  default     = "5m"
-}
-variable "ssh_disable_agent_forwarding" {
-  description = " If true, SSH agent forwarding will be disabled"
-  type        = bool
-  default     = false
-}
-variable "ssh_handshake_attempts" {
-  description = "The number of handshakes to attempt with SSH once it can connect. "
-  type        = number
-  default     = 10
-}
-variable "ssh_bastion_host" {
-  description = " A bastion host to use for the actual SSH connection."
-  type        = string
-  default     = ""
-}
-variable "ssh_bastion_port" {
-  description = "The port of the bastion host."
-  type        = number
-  default     = "22"
-}
-variable "ssh_bastion_agent_auth" {
-  description = ""
-  type        = bool
-  default     = false
-}
-variable "ssh_bastion_username" {
-  description = ""
-  type        = string
-  default     = ""
-}
-variable "ssh_bastion_password" {
-  description = ""
-  type        = string
-  sensitive   = true
-  default     = ""
-}
-variable "ssh_bastion_interactive" {
-  description = ""
-  type        = bool
-  default     = false
-}
-
-
-#################################################
-### Winrm variables
-#################################################
-variable "winrm_host" {
-  type        = string
-  description = "The address for WinRM to connect to."
-  default     = null
-}
-
-variable "winrm_no_proxy" {
-  type        = bool
-  description = "Setting this to true adds the remote host:port to the NO_PROXY environment variable. This has the effect of bypassing any configured proxies when connecting to the remote host."
-  default     = false
-}
-
-variable "winrm_port" {
-  type        = string
-  description = "The WinRM port to connect to. This defaults to 5985 for plain unencrypted connection and 5986 for SSL when winrm_use_ssl is set to true."
-  default     = "5985"
-}
-
-variable "winrm_timeout" {
-  type        = string
-  description = "The amount of time to wait for WinRM to become available. This defaults to 30m since setting up a Windows machine generally takes a long time."
-  default     = "15m"
-}
-
-variable "winrm_use_ssl" {
-  type        = bool
-  description = "If true, use HTTPS for WinRM."
-  default     = false
-}
-
-variable "winrm_insecure" {
-  type        = bool
-  description = "If true, do not check server certificate chain and host name."
-  default     = false
-}
-
-variable "winrm_use_ntlm" {
-  type        = bool
-  description = "If true, NTLMv2 authentication (with session security) will be used for WinRM, rather than default (basic authentication), removing the requirement for basic authentication to be enabled within the target guest. Further reading for remote connection authentication can be found here."
-  default     = false
-}
-
 
 #################################################
 ### Local Secrets variables
@@ -669,7 +668,6 @@ variable "vault_kv_path" {
 variable "ansible_path" {
   type = string
 }
-
 variable "ansible_playbook" {
   type    = string
   default = "packer.yml"
